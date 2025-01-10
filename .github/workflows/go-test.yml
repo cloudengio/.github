@@ -5,7 +5,7 @@ on:
     inputs:
       go-versions:
         required: true
-        type: string  # Accepts the multi-line string
+        type: string  # Accepts a multi-line string
         description: 'Go versions to test, each on a new line with a "- " prefix'
       os-version: 
         required: true
@@ -19,6 +19,12 @@ jobs:
         go-version: ${{ inputs.go-versions }}
     runs-on: ${{ inputs.os-version }}
     steps:
+      - name: Set git to use LF
+        if: ${{ inputs.os-version == 'windows-latest' }} 
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - name: Checkout code
         uses: actions/checkout@v4
 
