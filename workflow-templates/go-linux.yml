@@ -1,0 +1,14 @@
+name: go-linux
+
+on:
+  push:
+    branches: [$default-branch]
+  pull_request:
+    branches: [$default-branch]
+
+jobs:
+  test:
+    uses: cloudengio/.github/workflows/go-test
+    with:
+      go-versions: [1.22.x, 1.23.x]
+      os-version: ubuntu-latest
