@@ -8,7 +8,13 @@ on:
 
 jobs:
   test:
-    uses: cloudengio/.github/workflows/go-test
+    uses: cloudengio/.github/workflows/go-test.yml
+    with:
+      go-versions: [1.22.x, 1.23.x]
+      os-version: ubuntu-latest
+
+  lint:
+    uses: cloudengio/.github/workflows/go-lint.yml
     with:
       go-versions: [1.22.x, 1.23.x]
       os-version: ubuntu-latest
