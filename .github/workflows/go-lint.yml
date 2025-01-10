@@ -12,6 +12,9 @@ on:
         type: string
         default: ubuntu-latest
 
+permissions:
+  contents: read
+
 jobs:
   go-lint:
     runs-on: ${{ inputs.os-version }}
