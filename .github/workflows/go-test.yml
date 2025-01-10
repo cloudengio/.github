@@ -19,8 +19,10 @@ jobs:
   test:
     strategy:
       matrix:
-        go-version: ${{ inputs.go-versions }}
+        go-version: ${{ fromJson(inputs.go-versions) }}
+
     runs-on: ${{ inputs.os-version }}
+
     steps:
       - name: Set git to use LF
         if: ${{ inputs.os-version == 'windows-latest' }} 
