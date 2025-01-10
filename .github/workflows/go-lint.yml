@@ -2,10 +2,19 @@ name: go-lint
 
 on:
   workflow_call:
+    inputs:
+      go-version:
+        required: true
+        type: string
+        description: 'Go versions to test, each on a new line with a "- " prefix'
+      os-version: 
+        required: true
+        type: string
+        default: ubuntu-latest
 
 jobs:
   go-lint:
-    runs-on: ${{ inputs.os-versions }}
+    runs-on: ${{ inputs.os-version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -13,6 +22,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
+          go-version: ${{ inputs.go-version }}
           cache: true
 
       - name: Lint

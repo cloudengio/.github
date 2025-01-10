@@ -2,14 +2,22 @@ name: go-test
 
 on:
   workflow_call:
+    inputs:
+      go-versions:
+        required: true
+        type: string  # Accepts the multi-line string
+        description: 'Go versions to test, each on a new line with a "- " prefix'
+      os-version: 
+        required: true
+        type: string
+        default: ubuntu-latest
 
 jobs:
   test:
     strategy:
       matrix:
         go-version: ${{ inputs.go-versions }}
-        os: ${{ inputs.os-version }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ inputs.os-version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
