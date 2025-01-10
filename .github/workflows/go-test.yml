@@ -1,4 +1,4 @@
-name: go-test-lint
+name: go-test
 
 on:
   workflow_call:
@@ -23,24 +23,3 @@ jobs:
       - name: Test
         run: |
           go test --race --covermode=atomic ./...
-
-  lint:
-    runs-on: ${{ inputs.os-version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          cache: true
-
-      - name: Lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: latest
-
-      - name: Vulnerabilities
-        run: |
-          go install golang.org/x/vuln/cmd/govulncheck@latest
-          govulncheck ./...
