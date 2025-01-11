@@ -6,7 +6,7 @@ on:
       go-version:
         required: true
         type: string
-        description: 'Go versions to test, each on a new line with a "- " prefix'
+        description: 'A single go versions to lint with'
       os-version: 
         required: true
         type: string

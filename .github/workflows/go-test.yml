@@ -5,8 +5,8 @@ on:
     inputs:
       go-versions:
         required: true
-        type: string  # Accepts a multi-line string
-        description: 'Go versions to test, each on a new line with a "- " prefix'
+        type: string  
+        description: 'Possibly multiple versions to test, as a json multi-line string ["1.15", "1.16"]'
       os-version: 
         required: true
         type: string
