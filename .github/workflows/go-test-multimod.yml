@@ -14,34 +14,3 @@ on:
 
 permissions:
   contents: read
-
-jobs:
-  test:
-    strategy:
-      matrix:
-        go-version: ${{ fromJson(inputs.go-versions) }}
-
-    runs-on: ${{ inputs.os-version }}
-
-    steps:
-        - name: Set git to use LF
-          if: ${{ inputs.os-version == 'windows-latest' }} 
-          run: |
-            git config --global core.autocrlf false
-            git config --global core.eol lf
-  
-        - name: Checkout code
-          uses: actions/checkout@v4
-  
-        - name: Set up Go
-          uses: actions/setup-go@v5
-          with:
-            go-version: ${{ matrix.go-version }}
-            cache-dependency-path: "**/*.sum"
-
-        - name: Install tools
-          run: |
-            go install cloudeng.io/citools/multimod@latest
-    
-        - name: Test
-          run: multimod --config=.multimod.yaml test

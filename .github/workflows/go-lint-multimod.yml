@@ -1,0 +1,42 @@
+name: go-lint-multimod
+
+on:
+  workflow_call:
+    inputs:
+      go-version:
+        required: true
+        type: string  
+        description: 'A single go versions to lint with'
+      os-version: 
+        required: true
+        type: string
+        default: ubuntu-latest
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ inputs.os-version }}
+
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+  
+        - name: Set up Go
+          uses: actions/setup-go@v5
+          with:
+            go-version: ${{ inputs.go-version }}
+            cache-dependency-path: "**/*.sum"
+
+        - name: Install tools
+          run: |
+            go install cloudeng.io/citools/multimod@latest
+            go install golang.org/x/vuln/cmd/govulncheck@latest
+            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+
+        - name: Test
+          run: multimod --config=.multimod.yaml lint
+
+        - name: Vulnerability
+          run: multimod --config=.multimod.yaml govuln
