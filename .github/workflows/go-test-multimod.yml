@@ -7,6 +7,11 @@ on:
         required: true
         type: string  
         description: 'Possibly multiple versions to test, as a json multi-line string ["1.15", "1.16"]'
+        default: |
+          [
+            "1.22.x", 
+            "1.23.x"
+          ]
       os-version: 
         required: true
         type: string

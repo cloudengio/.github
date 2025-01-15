@@ -6,7 +6,7 @@ on:
       go-version:
         required: true
         type: string
-        description: 'A single go versions to lint with'
+        description: 'go versions to lint with'
         default: 1.23.x
       os-version: 
         required: true
