@@ -4,12 +4,10 @@ on:
   workflow_call:
     inputs:
       go-version:
-        required: true
         type: string  
         description: 'go versions to lint with'
         default: 1.23.x
       os-version: 
-        required: true
         type: string
         default: ubuntu-latest
 
