@@ -8,8 +8,8 @@ on:
         description: 'Possibly multiple versions to test, as a json multi-line string ["1.15", "1.16"]'
         default: |
           [
-            "1.22.x", 
-            "1.23.x"
+            "1.23.x", 
+            "1.24.x"
           ]
       os-version: 
         type: string
