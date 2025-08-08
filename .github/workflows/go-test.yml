@@ -28,11 +28,30 @@ jobs:
 
     steps:
       - name: Set git to use LF
-        if: ${{ inputs.os-version == 'windows-latest' }} 
+        if: ${{ runner.os == 'windows' }} 
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
+ 
+      - name: Windows mkcert setup
+        if : ${{ runner.os == 'windows' }}
+        run: |
+          choco install mkcert typescript
+          mkcert -install
 
+      - name: Linux mkcert, tsc setup
+        if : ${{ runner.os == 'linux' }}
+        run: |
+          sudo apt install -y libnss3-tools nodejs npm
+          npm install -g typescript
+          mkcert -install
+
+      - name: macOS mkcert, tsc setup
+        if : ${{ runner.os == 'macos' }}
+        run: |
+          brew install mkcert tsc
+          mkcert -install
+          
       - name: Checkout code
         uses: actions/checkout@v4
 
