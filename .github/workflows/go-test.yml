@@ -34,22 +34,22 @@ jobs:
           git config --global core.eol lf
  
       - name: Windows mkcert setup
-        if : ${{ runner.os == 'windows' }}
+        if: ${{ runner.os == 'windows' }}
         run: |
-          choco install mkcert typescript
+          choco install mkcert
           mkcert -install
 
-      - name: Linux mkcert, tsc setup
-        if : ${{ runner.os == 'linux' }}
+      - name: Linux mkcert
+        if: ${{ runner.os == 'linux' }}
         run: |
-          sudo apt install -y libnss3-tools nodejs npm
-          npm install -g typescript
+          sudo apt-get install -y libnss3-tools
+          brew install mkcert
           mkcert -install
 
-      - name: macOS mkcert, tsc setup
-        if : ${{ runner.os == 'macos' }}
+      - name: macOS mkcert setup
+        if: ${{ runner.os == 'macos' }}
         run: |
-          brew install mkcert tsc
+          brew install mkcert
           mkcert -install
           
       - name: Checkout code
