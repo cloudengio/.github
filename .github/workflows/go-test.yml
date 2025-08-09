@@ -43,9 +43,7 @@ jobs:
         if: ${{ runner.os == 'linux' }}
         run: |
           sudo apt-get install -y libnss3-tools
-          brew install mkcert
-          mkcert -install
-
+ 
       - name: macOS mkcert setup
         if: ${{ runner.os == 'macos' }}
         run: |
@@ -65,7 +63,7 @@ jobs:
         run: |
           git clone https://github.com/FiloSottile/mkcert && cd mkcert
           go build -ldflags "-X main.Version=$(git describe --tags)"
-          mkcert -install
+          ./mkcert -install
 
       - name: Test
         run: |

@@ -64,7 +64,7 @@ jobs:
             go install cloudeng.io/citools/multimod@latest
             git clone https://github.com/FiloSottile/mkcert && cd mkcert
             go build -ldflags "-X main.Version=$(git describe --tags)"
-            mkcert -install
+            ./mkcert -install
     
         - name: Test
           run: multimod --config=.multimod.yaml test
