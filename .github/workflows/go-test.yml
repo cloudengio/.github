@@ -61,6 +61,12 @@ jobs:
           go-version: ${{ matrix.go-version }}
           cache: true
 
+      - name: Install tools, mkcert
+        run: |
+          git clone https://github.com/FiloSottile/mkcert && cd mkcert
+          go build -ldflags "-X main.Version=$(git describe --tags)"
+          mkcert -install
+
       - name: Test
         run: |
           go test --race --covermode=atomic ./...
