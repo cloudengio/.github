@@ -39,7 +39,7 @@ jobs:
             choco install mkcert
             mkcert -install
 
-        - name: Linux mkcert
+        - name: Linux mkcert setup
           if: ${{ runner.os == 'linux' }}
           run: |
             sudo apt-get install -y libnss3-tools
@@ -49,6 +49,23 @@ jobs:
           run: |
             brew install mkcert
             mkcert -install
+
+        - name: Windows chromedp setup
+          if: ${{ runner.os == 'windows' }}
+          run: |
+            choco install chromium
+
+        - name: Linux mkcert
+          if: ${{ runner.os == 'linux' }}
+          run: |
+            sudo apt-get update -y
+            sudo apt-get install -y libnss3-tools
+            sudo apt-get install -y chrome-stable
+
+        - name: macOS chromedp
+          if: ${{ runner.os == 'macos' }}
+          run: |
+            brew install chrome-devtools
 
         - name: Checkout code
           uses: actions/checkout@v4
