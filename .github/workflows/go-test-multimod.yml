@@ -52,6 +52,7 @@ jobs:
 
         - name: chrome
           uses: browser-actions/setup-chrome@v2
+          id: setup-chrome
 
         - name: Checkout code
           uses: actions/checkout@v4
@@ -69,4 +70,6 @@ jobs:
             mkcert -install
     
         - name: Test
+          env: 
+            CHROME_BIN_PATH: ${{ steps.setup-chrome.outputs.chrome-path }} 
           run: multimod --config=.multimod.yaml test
