@@ -33,29 +33,6 @@ jobs:
             git config --global core.autocrlf false
             git config --global core.eol lf
 
-        - name: Windows mkcert setup
-          if: ${{ runner.os == 'windows' }}
-          run: |
-            choco install mkcert
-            mkcert -install
-
-        - name: Linux mkcert setup
-          if: ${{ runner.os == 'linux' }}
-          run: |
-            sudo apt-get install -y libnss3-tools
-
-        - name: chrome
-          uses: browser-actions/setup-chrome@v2
-          id: setup-chrome
-          with:
-            install-dependencies: true
-
-        - name: init chrome
-          run: |
-            chrome --version
-            chrome --headless=new --disable-gpu --no-sandbox https://google.com
-    
-        
         - name: Checkout code
           uses: actions/checkout@v4
   
@@ -65,13 +42,28 @@ jobs:
             go-version: ${{ matrix.go-version }}
             cache-dependency-path: "**/*.sum"
 
-        - name: Install tools, multimod, mkcert
+        - name: chrome
+          uses: browser-actions/setup-chrome@v2
+          id: setup-chrome
+          with:
+            install-dependencies: true
+
+        - name: Linux mkcert requirements
+          if: ${{ runner.os == 'linux' }}
+          run: |
+            sudo apt-get install -y libnss3-tools
+
+        - name: Build and run mkcert
+          working-directory: $RUNNER_TEMP
+          run: |
+            git clone https://github.com/FiloSottile/mkcert && cd mkcert
+            go build -ldflags "-X main.Version=$(git describe --tags)"
+            ${RUNNER_TEMP}/mkcert -install
+
+        - name: Install tools
           run: |
             go install cloudeng.io/citools/multimod@latest
-            go install -x filippo.io/mkcert@latest
-            mkcert -install
-            sudo /home/runner/go/bin/mkcert -install
-    
+     
         - name: Test
           env: 
             CHROME_BIN_PATH: ${{ steps.setup-chrome.outputs.chrome-path }} 
