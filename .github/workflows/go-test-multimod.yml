@@ -49,6 +49,10 @@ jobs:
           id: setup-chrome
           with:
             install-dependencies: true
+
+        - name: init chrome
+          run: |
+            chrome --version
         
         - name: Checkout code
           uses: actions/checkout@v4
