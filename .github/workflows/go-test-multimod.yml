@@ -44,16 +44,12 @@ jobs:
           run: |
             sudo apt-get install -y libnss3-tools
 
-        - name: macOS mkcert setup
-          if: ${{ runner.os == 'macos' }}
-          run: |
-            brew install mkcert
-            mkcert -install
-
         - name: chrome
           uses: browser-actions/setup-chrome@v2
           id: setup-chrome
-
+          with:
+            install-dependencies: true
+        
         - name: Checkout code
           uses: actions/checkout@v4
   
@@ -67,7 +63,7 @@ jobs:
           run: |
             go install cloudeng.io/citools/multimod@latest
             go install filippo.io/mkcert@latest
-            mkcert -install
+            sudo mkcert -install
     
         - name: Test
           env: 
