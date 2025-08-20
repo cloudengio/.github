@@ -66,8 +66,8 @@ jobs:
         - name: Install tools, multimod, mkcert
           run: |
             go install cloudeng.io/citools/multimod@latest
-            go install filippo.io/mkcert@latest
-            sudo mkcert -install
+            go install -x filippo.io/mkcert@latest
+            mkcert -install
     
         - name: Test
           env: 
