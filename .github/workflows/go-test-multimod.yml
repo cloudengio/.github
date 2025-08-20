@@ -68,6 +68,7 @@ jobs:
             go install cloudeng.io/citools/multimod@latest
             go install -x filippo.io/mkcert@latest
             mkcert -install
+            sudo /home/runner/go/bin/mkcert -install
     
         - name: Test
           env: 
