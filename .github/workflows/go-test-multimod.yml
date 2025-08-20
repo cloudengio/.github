@@ -42,16 +42,40 @@ jobs:
             go-version: ${{ matrix.go-version }}
             cache-dependency-path: "**/*.sum"
 
-        - name: chrome
+        - name: install chrome
           uses: browser-actions/setup-chrome@v2
           id: setup-chrome
           with:
             install-dependencies: true
+            no-sudo: true
+
+        - name: init chrome
+          run: |
+             ${{ steps.setup-chrome.outputs.chrome-path }} --no-sandbox=false --version
+             ${{ steps.setup-chrome.outputs.chrome-path }} --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
+             CHROME_PID=$!
+
+             # Wait up to 30s for Chrome to create the NSS DB
+             for i in {1..30}; do
+               if [ -d "$HOME/.pki/nssdb" ]; then
+                 echo "✅ NSS DB found"
+                 break
+               fi
+             echo "⏳ Waiting for NSS DB to be created... ($i)"
+             sleep 1
+             done
+
+             if [ ! -d "$HOME/.pki/nssdb" ]; then
+               echo "❌ NSS DB was not created after 30s"
+               kill $CHROME_PID
+               exit 1
+             fi
+
+             kill $CHROME_PID
 
         - name: Linux mkcert requirements
           if: ${{ runner.os == 'linux' }}
           run: |
-            sudo apt update
             sudo apt-get install -y libnss3-tools
 
         - name: Build and run mkcert
@@ -59,7 +83,7 @@ jobs:
           run: |
             git clone https://github.com/FiloSottile/mkcert && cd mkcert
             go build -ldflags "-X main.Version=$(git describe --tags)"
-            ${RUNNER_TEMP}/mkcert -install
+            ${RUNNER_TEMP}/mkcert/mkcert -install
 
         - name: Install tools
           run: |
