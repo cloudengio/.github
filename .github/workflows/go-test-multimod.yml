@@ -53,6 +53,8 @@ jobs:
         - name: init chrome
           run: |
             chrome --version
+            chrome --headless=new --disable-gpu --no-sandbox https://google.com
+    
         
         - name: Checkout code
           uses: actions/checkout@v4
