@@ -6,7 +6,7 @@ on:
       go-version:
         type: string
         description: 'go versions to lint with'
-        default: 1.24.x
+        default: 1.25.x
       os-version: 
         type: string
         default: ubuntu-latest
@@ -19,10 +19,10 @@ jobs:
     runs-on: ${{ inputs.os-version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ inputs.go-version }}
           cache: true
