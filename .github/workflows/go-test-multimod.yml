@@ -4,16 +4,28 @@ on:
   workflow_call:
     inputs:
       go-versions:
-        type: string  
+        type: string
         description: 'Possibly multiple versions to test, as a json multi-line string ["1.15", "1.16"]'
         default: |
           [
             "1.24.x"
             "1.25.x", 
           ]
-      os-version: 
+      os-version:
         type: string
         default: ubuntu-latest
+      init-chrome:
+        type: boolean
+        description: "Initialize chrome to create NSS DB for mkcert"
+        default: false
+      init-pebble:
+        type: boolean
+        description: "Initialize pebble mock server for acme/letsencrypt testing"
+        default: false
+      init-mkcert:
+        type: boolean
+        description: "Initialize mkcert for local development"
+        default: false
 
 permissions:
   contents: read
@@ -27,67 +39,76 @@ jobs:
     runs-on: ${{ inputs.os-version }}
 
     steps:
-        - name: Set git to use LF
-          if: ${{ runner.os == 'windows' }} 
-          run: |
-            git config --global core.autocrlf false
-            git config --global core.eol lf
+      - name: Set git to use LF
+        if: ${{ runner.os == 'windows' }}
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
 
-        - name: Checkout code
-          uses: actions/checkout@v5
-  
-        - name: Set up Go
-          uses: actions/setup-go@v6
-          with:
-            go-version: ${{ matrix.go-version }}
-            cache-dependency-path: "**/*.sum"
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-        - name: install chrome
-          uses: browser-actions/setup-chrome@v2
-          id: setup-chrome
-          with:
-            install-dependencies: true
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache-dependency-path: "**/*.sum"
 
-        - name: init chrome
-          run: |
-            chrome --version
-            chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
-             CHROME_PID=$!
+      - name: install chrome
+        if: ${{ inputs.init-chrome }}
+        uses: browser-actions/setup-chrome@v2
+        id: setup-chrome
+        with:
+          install-dependencies: true
 
-             # Wait up to 30s for Chrome to create the NSS DB
-             for i in {1..30}; do
-               if [ -d "$HOME/.pki/nssdb" ]; then
-                 echo "✅ NSS DB found"
-                 break
-               fi
-             echo "⏳ Waiting for NSS DB to be created... ($i)"
-             sleep 1
-             done
+      - name: init chrome
+        if: ${{ inputs.init-chrome }}
+        run: |
+          chrome --version
+          chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
+           CHROME_PID=$!
 
-             if [ ! -d "$HOME/.pki/nssdb" ]; then
-               echo "❌ NSS DB was not created after 30s"
-               kill $CHROME_PID
-               exit 1
+           # Wait up to 30s for Chrome to create the NSS DB
+           for i in {1..30}; do
+             if [ -d "$HOME/.pki/nssdb" ]; then
+               echo "✅ NSS DB found"
+               break
              fi
+           echo "⏳ Waiting for NSS DB to be created... ($i)"
+           sleep 1
+           done
 
+           if [ ! -d "$HOME/.pki/nssdb" ]; then
+             echo "❌ NSS DB was not created after 30s"
              kill $CHROME_PID
+             exit 1
+           fi
 
-        - name: Linux mkcert requirements
-          if: ${{ runner.os == 'linux' }}
-          run: |
-            sudo apt-get install -y libnss3-tools
+           kill $CHROME_PID
 
-        - name: Build and run mkcert
-          working-directory: ${{ runner.temp }}
-          run: |
-            go install filippo.io/mkcert@latest
-            mkcert -install
+      - name: Linux mkcert requirements
+        if: ${{ runner.os == 'linux' }}
+        run: |
+          sudo apt-get install -y libnss3-tools
 
-        - name: Install tools
-          run: |
-            go install cloudeng.io/citools/multimod@latest
-     
-        - name: Test
-          env: 
-            CHROME_BIN_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
-          run: multimod --config=.multimod.yaml test
+      - name: Build and run mkcert
+        if: ${{ inputs.init-mkcert }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          go install filippo.io/mkcert@latest
+          mkcert -install
+
+      - name: init pebble
+        if: ${{ inputs.init-pebble }}
+        run: |
+          go install github.com/letsencrypt/pebble/v2@latest
+          go install github.com/jsha/minica@latest
+
+      - name: Install tools
+        run: |
+          go install cloudeng.io/citools/multimod@latest
+
+      - name: Test
+        env:
+          CHROME_BIN_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: multimod --config=.multimod.yaml test
