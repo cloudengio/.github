@@ -101,7 +101,7 @@ jobs:
       - name: init pebble
         if: ${{ inputs.init-pebble }}
         run: |
-          go install github.com/letsencrypt/pebble/v2@latest
+          go install github.com/letsencrypt/pebble/v2/cmd/pebble@latest
           go install github.com/jsha/minica@latest
 
       - name: Install tools
