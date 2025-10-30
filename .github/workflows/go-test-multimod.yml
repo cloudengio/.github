@@ -118,6 +118,7 @@ jobs:
 
       - name: test pebble hosts
         run: |
+          cat /etc/hosts
           ping -c 2 pebble-test.example.com
           ping -c 2 pebble.example.com
 
