@@ -108,13 +108,13 @@ jobs:
         # Use PowerShell (the default shell on Windows runners)
         if: ${{ runner.os == 'windows' }}
         run: |
-          Add-Content -Path $env:WINDIR\System32\drivers\etc\hosts -Value "127.0.0.1 pebble.example.com. pebble-test.example.com."
+          Add-Content -Path $env:WINDIR\System32\drivers\etc\hosts -Value "127.0.0.1 pebble.example.com pebble-test.example.com"
         shell: pwsh
 
       - name: init pebble hosts linux or macos
         if: ${{ runner.os == 'linux' || runner.os == 'macos' }}
         run: |
-          echo "127.0.0.1 pebble.example.com. pebble-test.example.com." | sudo tee -a /etc/hosts
+          echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
 
       - name: test pebble hosts
         run: |
