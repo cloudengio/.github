@@ -86,12 +86,12 @@ jobs:
 
            kill $CHROME_PID
 
-      - name: Linux mkcert requirements
+      - name: linux mkcert requirements
         if: ${{ runner.os == 'linux' }}
         run: |
           sudo apt-get install -y libnss3-tools
 
-      - name: Build and run mkcert
+      - name: build and run mkcert
         if: ${{ inputs.init-mkcert }}
         working-directory: ${{ runner.temp }}
         run: |
@@ -112,15 +112,20 @@ jobs:
         shell: pwsh
 
       - name: init pebble hosts linux or macos
-        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        if: ${{ runner.os == 'linux' || runner.os == 'macos' }}
         run: |
           echo "127.0.0.1 pebble.example.com. pebble-test.example.com." | sudo tee -a /etc/hosts
 
-      - name: Install tools
+      - name: test pebble hosts
+        run: |
+          ping -c 2 pebble-test.example.com
+          ping -c 2 pebble.example.com
+
+      - name: install tools
         run: |
           go install cloudeng.io/citools/multimod@latest
 
-      - name: Test
+      - name: test
         env:
           CHROME_BIN_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: multimod --config=.multimod.yaml test
