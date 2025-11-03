@@ -13,19 +13,16 @@ jobs:
   chrome:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: ./actions/chrome
+      - uses: ./.github/actions/chrome
 
   mkcert:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: ./actions/go
-      - uses: ./actions/mkcert
+      - uses: ./.github/actions/go
+      - uses: ./.github/actions/mkcert
 
   pebble:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: ./actions/go
-      - uses: ./actions/pebble
+      - uses: ./.github/actions/go
+      - uses: ./.github/actions/pebble
