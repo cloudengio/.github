@@ -9,8 +9,16 @@ on:
 permissions:
   contents: read
 
+env:
+  OS_VERSION: macos-latest
+
 jobs:
   init-chrome:
     uses: ./.github/workflows/init-chrome.yml
     with:
-      os-version: macos-latest
+      os-version: ${{ env.OS_VERSION }}
+
+  mkcert:
+    uses: ./.github/workflows/mkcert.yml
+    with:
+      os-version: ${{ env.OS_VERSION }}

@@ -9,8 +9,16 @@ on:
 permissions:
   contents: read
 
+env:
+  OS_VERSION: ubuntu-latest
+
 jobs:
-  init-chrome:
-    uses: ./.github/workflows/init-chrome.yml
+  chrome:
+    uses: ./.github/workflows/chrome.yml
     with:
-      os-version: ubuntu-latest
+      os-version: ${{ env.OS_VERSION }}
+
+  mkcert:
+    uses: ./.github/workflows/mkcert.yml
+    with:
+      os-version: ${{ env.OS_VERSION }}

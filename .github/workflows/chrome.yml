@@ -1,4 +1,4 @@
-name: init-chrome
+name: chrome
 
 on:
   workflow_call:
