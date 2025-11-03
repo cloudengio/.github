@@ -11,21 +11,21 @@ permissions:
 
 jobs:
   chrome:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: ./actions/chrome@main
+      - uses: ./.github/actions/chrome
 
   mkcert:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: ./actions/go@main
-      - uses: ./actions/mkcert@main
+      - uses: ./.github/actions/go
+      - uses: ./.github/actions/mkcert
 
   pebble:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: ./actions/go@main
-      - uses: ./actions/pebble@main
+      - uses: ./.github/actions/go
+      - uses: ./.github/actions/pebble

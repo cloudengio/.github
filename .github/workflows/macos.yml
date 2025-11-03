@@ -10,24 +10,22 @@ permissions:
   contents: read
 
 jobs:
-  go:
-    uses: ./.github/workflows/go-action.yml
-    with:
-      os-version: macos-latest
+  chrome:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/chrome
 
-  #chrome:
-  #  uses: ./.github/workflows/chrome.yml
-  #  with:
-  #    os-version: macos-latest
-
-  #mkcert:
-  #  needs: go
-  #  uses: ./.github/workflows/mkcert.yml
-  #  with:
-  #    os-version: macos-latest
+  mkcert:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/go
+      - uses: ./.github/actions/mkcert
 
   pebble:
     runs-on: macos-latest
     steps:
-      - uses: ./.github/workflows/go.yml
-      - uses: ./.github/workflows/pebble.yml
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/go
+      - uses: ./.github/actions/pebble
