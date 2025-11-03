@@ -1,4 +1,4 @@
-name: linux-setup
+name: macos-setup
 
 on:
   push:

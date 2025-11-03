@@ -1,4 +1,4 @@
-name: linux-setup
+name: windows-setup
 
 on:
   push:
