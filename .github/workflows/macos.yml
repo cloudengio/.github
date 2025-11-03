@@ -1,0 +1,16 @@
+name: linux-setup
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  init-chrome:
+    uses: ./.github/workflows/init-chrome.yml
+    with:
+      os-version: macos-latest
