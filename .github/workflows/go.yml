@@ -1,0 +1,31 @@
+name: go
+
+on:
+  workflow_call:
+    inputs:
+      os-version:
+        type: string
+        default: ubuntu-latest
+
+permissions:
+  contents: read
+
+env:
+  OS_VERSION: ubuntu-latest
+
+jobs:
+  common:
+    runs-on: ${{ inputs.os-version }}
+
+    steps:
+      - name: Set git to use LF
+        if: ${{ runner.os == 'windows' }}
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6

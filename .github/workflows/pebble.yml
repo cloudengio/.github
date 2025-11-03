@@ -1,0 +1,39 @@
+name: pebble
+
+on:
+  workflow_call:
+    inputs:
+      os-version:
+        type: string
+        default: ubuntu-latest
+
+permissions:
+  contents: read
+
+jobs:
+  chrome:
+    runs-on: ${{ inputs.os-version }}
+
+    steps:
+      - name: install pebble and minica
+        run: |
+          go install github.com/letsencrypt/pebble/v2/cmd/pebble@latest
+          go install github.com/jsha/minica@latest
+
+      - name: init pebble hosts windows
+        # Use PowerShell (the default shell on Windows runners)
+        if: ${{ runner.os == 'windows' }}
+        run: |
+          Add-Content -Path $env:WINDIR\System32\drivers\etc\hosts -Value "127.0.0.1 pebble.example.com pebble-test.example.com"
+        shell: pwsh
+
+      - name: init pebble hosts linux or macos
+        if: ${{ runner.os == 'linux' || runner.os == 'macos' }}
+        run: |
+          echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
+
+      - name: test pebble hosts
+        run: |
+          cat /etc/hosts
+          ping -c 2 pebble-test.example.com
+          ping -c 2 pebble.example.com
