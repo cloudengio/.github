@@ -7,7 +7,9 @@ runs:
       uses: browser-actions/setup-chrome@v2
       id: setup-chrome
       with:
-        install-dependencies: true
+        #install-dependencies: true
+        chrome-version: stable
+        install-chromedriver: true
 
     - name: init chrome Linux
       shell: bash
