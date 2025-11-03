@@ -21,8 +21,8 @@ jobs:
         with:
           install-dependencies: true
 
-      - name: init chrome linux
-        if: ${{ runner.os == 'linux' }}
+      - name: init chrome Linux
+        if: ${{ runner.os == 'Linux' }}
         run: |
           chrome --version
           chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
@@ -45,8 +45,8 @@ jobs:
              exit 1
            fi
 
-      - name: init chrome windows
-        if: ${{ runner.os == 'windows' }}
+      - name: init chrome Windows
+        if: ${{ runner.os == 'Windows' }}
         run: |
           & "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
           & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --remote-debugging-port=9222 about:blank

@@ -12,20 +12,20 @@ jobs:
     runs-on: ${{ inputs.os-version }}
 
     steps:
-      - name: linux mkcert requirements
-        if: ${{ runner.os == 'linux' }}
+      - name: mkcert requirements for Linux
+        if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get install -y libnss3-tools
 
-      - name: build and run mkcert macos and linux
-        if: ${{ runner.os == 'macos'  || runner.os == 'linux' }}
+      - name: build and run mkcert macos and Linux
+        if: ${{ runner.os == 'macos'  || runner.os == 'Linux' }}
         working-directory: ${{ runner.temp }}
         run: |
           go install filippo.io/mkcert@latest
           mkcert -install
 
-      - name: build and run mkcert windows
-        if: ${{ runner.os == 'windows' }}
+      - name: build and run mkcert Windows
+        if: ${{ runner.os == 'Windows' }}
         working-directory: ${{ runner.temp }}
         shell: pwsh
         run: |

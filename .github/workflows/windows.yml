@@ -19,7 +19,7 @@ jobs:
       os-version: ${{ env.OS_VERSION }}
 
   chrome:
-    uses: ./.github/workflows/init-chrome.yml
+    uses: ./.github/workflows/chrome.yml
     with:
       os-version: ${{ env.OS_VERSION }}
 
