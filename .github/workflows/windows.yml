@@ -10,24 +10,22 @@ permissions:
   contents: read
 
 jobs:
-  go:
-    uses: ./.github/workflows/go.yml
-    with:
-      os-version: windows-latest
-
   chrome:
-    uses: ./.github/workflows/chrome.yml
-    with:
-      os-version: windows-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./actions/chrome@main
 
   mkcert:
-    needs: go
-    uses: ./.github/workflows/mkcert.yml
-    with:
-      os-version: windows-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./actions/go@main
+      - uses: ./actions/mkcert@main
 
   pebble:
-    needs: go
-    uses: ./.github/workflows/pebble.yml
-    with:
-      os-version: windows-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./actions/go@main
+      - uses: ./actions/pebble@main
