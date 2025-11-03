@@ -22,3 +22,10 @@ runs:
       uses: actions/setup-go@v6
       with:
         go-version: ${{ inputs.go-version }}
+
+    - name: Install tools
+      shell: bash
+      run: |
+        go install cloudeng.io/citools/multimod@latest
+        go install golang.org/x/vuln/cmd/govulncheck@latest
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin

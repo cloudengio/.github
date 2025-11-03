@@ -23,7 +23,7 @@ runs:
       shell: pwsh
       working-directory: ${{ runner.temp }}
       run: |
-        choco install mkcert -y
+        go install filippo.io/mkcert@latest
         $CAROOT = mkcert -CAROOT
 
         mkcert -cert-file "$CAROOT\rootCA.pem" -key-file "$CAROOT\rootCA-key.pem" localhost
