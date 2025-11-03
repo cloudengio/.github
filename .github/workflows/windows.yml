@@ -9,28 +9,25 @@ on:
 permissions:
   contents: read
 
-env:
-  OS_VERSION: windows-latest
-
 jobs:
   go:
     uses: ./.github/workflows/go.yml
     with:
-      os-version: ${{ env.OS_VERSION }}
+      os-version: windows-latest
 
   chrome:
     uses: ./.github/workflows/chrome.yml
     with:
-      os-version: ${{ env.OS_VERSION }}
+      os-version: windows-latest
 
   mkcert:
     needs: go
     uses: ./.github/workflows/mkcert.yml
     with:
-      os-version: ${{ env.OS_VERSION }}
+      os-version: windows-latest
 
   pebble:
     needs: go
     uses: ./.github/workflows/pebble.yml
     with:
-      os-version: ${{ env.OS_VERSION }}
+      os-version: windows-latest
