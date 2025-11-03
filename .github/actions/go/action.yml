@@ -2,8 +2,8 @@ name: "Setup go environment"
 description: "Installs Go and caches Go modules"
 inputs:
   go-version:
-    description: "The Go version to set up"
-    required: true
+    description: "go versions to set up"
+    default: "stable"
 
 runs:
   using: "composite"
@@ -22,3 +22,5 @@ runs:
       uses: actions/setup-go@v6
       with:
         go-version: ${{ inputs.go-version }}
+      run: |
+        go version

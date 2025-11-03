@@ -15,7 +15,7 @@ runs:
       run: |
         chrome --version
         chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
-          chROME_PID=$!
+          CHROME_PID=$!
 
           # Wait up to 30s for Chrome to create the NSS DB
           for i in {1..30}; do
