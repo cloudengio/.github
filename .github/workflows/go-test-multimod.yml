@@ -14,18 +14,6 @@ on:
       os-version:
         type: string
         default: ubuntu-latest
-      init-chrome:
-        type: boolean
-        description: "Initialize chrome to create NSS DB for mkcert"
-        default: false
-      init-pebble:
-        type: boolean
-        description: "Initialize pebble mock server for acme/letsencrypt testing"
-        default: false
-      init-mkcert:
-        type: boolean
-        description: "Initialize mkcert for local development"
-        default: false
 
 permissions:
   contents: read
@@ -39,130 +27,12 @@ jobs:
     runs-on: ${{ inputs.os-version }}
 
     steps:
-      - name: Set git to use LF
-        if: ${{ runner.os == 'windows' }}
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: ${{ matrix.go-version }}
-          cache-dependency-path: "**/*.sum"
-
-      - name: install chrome
-        if: ${{ inputs.init-chrome }}
-        uses: browser-actions/setup-chrome@v2
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/go
+      - uses: ./.github/actions/mkcert
+      - uses: ./.github/actions/pebble
+      - uses: ./.github/actions/chrome
         id: setup-chrome
-        with:
-          install-dependencies: true
-
-      - name: init chrome linux
-        if: ${{ inputs.init-chrome && runner.os == 'linux' }}
-        run: |
-          chrome --version
-          chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
-           CHROME_PID=$!
-
-           # Wait up to 30s for Chrome to create the NSS DB
-           for i in {1..30}; do
-             if [ -d "$HOME/.pki/nssdb" ]; then
-               echo "✅ NSS DB found"
-               break
-             fi
-           echo "⏳ Waiting for NSS DB to be created... ($i)"
-           sleep 1
-           done
-
-           kill $CHROME_PID
-
-           if [ ! -d "$HOME/.pki/nssdb" ]; then
-             echo "❌ NSS DB was not created after 30s"
-             exit 1
-           fi
-
-      - name: init chrome macos
-        if: ${{ inputs.init-chrome && runner.os == 'macos' }}
-        run: |
-          /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
-          /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
-          CHROME_PID=$!
-
-          # Wait up to 30s for Chrome to create the NSS DB
-          for i in {1..30}; do
-            if [ -d "$HOME/Library/Application Support/Google/Chrome/Default" ]; then
-              echo "✅ Default profile created"
-              break
-            fi
-            echo "⏳ Waiting for Default profile to be created... ($i)"
-            ls -l "$HOME/Library/Application Support/Google/Chrome/"
-            sleep 1
-          done
-
-          kill $CHROME_PID
-
-          if [ ! -d "$HOME/Library/Application Support/Google/Chrome/Default" ]; then
-            echo "❌ Default profile was not created after 30s"
-            exit 1
-          fi
-
-      - name: init chrome windows
-        if: ${{ inputs.init-chrome && runner.os == 'windows' }}
-        run: |
-          & "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
-          & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --remote-debugging-port=9222 about:blank
-          Start-Sleep -Seconds 5
-
-      - name: linux mkcert requirements
-        if: ${{ runner.os == 'linux' }}
-        run: |
-          sudo apt-get install -y libnss3-tools
-
-      - name: build and run mkcert macos and linux
-        if: ${{ inputs.init-mkcert && (runner.os == 'macos'  || runner.os == 'linux') }}
-        working-directory: ${{ runner.temp }}
-        run: |
-          go install filippo.io/mkcert@latest
-          mkcert -install
-
-      - name: build and run mkcert windows
-        if: ${{ inputs.init-mkcert && runner.os == 'windows' }}
-        working-directory: ${{ runner.temp }}
-        run: |
-          choco install mkcert
-          mkcert -install
-
-      - name: init pebble
-        if: ${{ inputs.init-pebble }}
-        run: |
-          go install github.com/letsencrypt/pebble/v2/cmd/pebble@latest
-          go install github.com/jsha/minica@latest
-
-      - name: init pebble hosts windows
-        # Use PowerShell (the default shell on Windows runners)
-        if: ${{ runner.os == 'windows' }}
-        run: |
-          Add-Content -Path $env:WINDIR\System32\drivers\etc\hosts -Value "127.0.0.1 pebble.example.com pebble-test.example.com"
-        shell: pwsh
-
-      - name: init pebble hosts linux or macos
-        if: ${{ runner.os == 'linux' || runner.os == 'macos' }}
-        run: |
-          echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
-
-      - name: test pebble hosts
-        run: |
-          cat /etc/hosts
-          ping -c 2 pebble-test.example.com
-          ping -c 2 pebble.example.com
-
-      - name: install tools
-        run: |
-          go install cloudeng.io/citools/multimod@latest
 
       - name: test
         env:

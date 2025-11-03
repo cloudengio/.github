@@ -2,13 +2,14 @@ name: "Setup go environment"
 description: "Installs Go and caches Go modules"
 inputs:
   go-version:
-    description: "The Go version to set up"
-    required: true
+    description: "go versions to set up"
+    default: "stable"
 
 runs:
   using: "composite"
   steps:
     - name: Set git to use LF
+      shell: pwsh
       if: ${{ runner.os == 'windows' }}
       run: |
         git config --global core.autocrlf false
@@ -21,3 +22,10 @@ runs:
       uses: actions/setup-go@v6
       with:
         go-version: ${{ inputs.go-version }}
+
+    - name: Install tools
+      shell: bash
+      run: |
+        go install cloudeng.io/citools/multimod@latest
+        go install golang.org/x/vuln/cmd/govulncheck@latest
+        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin

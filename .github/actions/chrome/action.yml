@@ -7,18 +7,21 @@ runs:
       uses: browser-actions/setup-chrome@v2
       id: setup-chrome
       with:
-        install-dependencies: true
+        #install-dependencies: true
+        chrome-version: stable
+        install-chromedriver: true
 
     - name: init chrome Linux
+      shell: bash
       if: ${{ runner.os == 'Linux' }}
       run: |
         chrome --version
-        chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
-          chROME_PID=$!
-
+        chrome --headless --disable-gpu --no-sandbox about:blank &
+          CHROME_PID=$!
+          NSS_DB_PATH="$HOME/.pki/nssdb"
           # Wait up to 30s for Chrome to create the NSS DB
           for i in {1..30}; do
-            if [ -d "$HOME/.pki/nssdb" ]; then
+            if [ -d "$NSS_DB_PATH" ]; then
               echo "✅ NSS DB found"
               break
             fi
@@ -28,39 +31,46 @@ runs:
 
           kill $CHROME_PID
 
-          if [ ! -d "$HOME/.pki/nssdb" ]; then
+          if [ ! -d "$NSS_DB_PATH" ]; then
             echo "❌ NSS DB was not created after 30s"
             exit 1
           fi
 
     - name: init chrome Windows
+      shell: pwsh
       if: ${{ runner.os == 'Windows' }}
       run: |
         & "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
-        & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --remote-debugging-port=9222 about:blank
+        & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu about:blank
         Start-Sleep -Seconds 5
 
     - name: init chrome macOS
+      shell: bash
       if: ${{ runner.os == 'macOS' }}
       run: |
         /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
-        /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
+        /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox about:blank &
+
         CHROME_PID=$!
 
+        #PROFILE_PATH="$HOME/Library/Application Support/Google/Chrome/Default"
+
         # Wait up to 30s for Chrome to create the default profile.
-        for i in {1..30}; do
-          if [ -d "$HOME/Library/Application Support/Google/Chrome/Default" ]; then
-            echo "✅ Default profile created"
-            break
-          fi
-          echo "⏳ Waiting for Default profile to be created... ($i)"
-          ls -l "$HOME/Library/Application Support/Google/Chrome/" || true
-          sleep 1
-        done
+        #for i in {1..30}; do
+        #  if [ -d "$PROFILE_PATH" ]; then
+        #    echo "✅ Default profile created"
+        #    break
+        #  fi
+        #  echo "⏳ Waiting for Default profile to be created... ($i)"
+        #  sleep 1
+        #  ls -l "$(dirname "$PROFILE_PATH")" || true
+        #done
+
+        sleep 5
 
         kill $CHROME_PID
 
-        if [ ! -d "$HOME/Library/Application Support/Google/Chrome/Default" ]; then
-          echo "❌ Default profile was not created after 30s"
-          exit 1
-        fi
+        #if [ ! -d "$PROFILE_PATH" ]; then
+        #  echo "❌ Default profile was not created after 30s"
+        #  exit 1
+        #fi

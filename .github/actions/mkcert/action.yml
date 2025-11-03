@@ -1,0 +1,35 @@
+name: mkcert
+description: "Install mkcert and set up local CA"
+
+runs:
+  using: "composite"
+  steps:
+    - name: mkcert requirements for Linux
+      if: ${{ runner.os == 'Linux' }}
+      shell: bash
+      run: |
+        sudo apt-get install -y libnss3-tools
+
+    - name: build and run mkcert macOS and Linux
+      if: ${{ runner.os == 'macOS'  || runner.os == 'Linux' }}
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: |
+        go install filippo.io/mkcert@latest
+        mkcert -install
+
+    - name: build and run mkcert Windows
+      if: ${{ runner.os == 'Windows' }}
+      shell: pwsh
+      working-directory: ${{ runner.temp }}
+      run: |
+        go install filippo.io/mkcert@latest
+        $CAROOT = mkcert -CAROOT
+
+        mkcert -cert-file "$CAROOT\rootCA.pem" -key-file "$CAROOT\rootCA-key.pem" localhost
+
+        # Trust the root certificate using certutil (no GUI)
+        certutil -addstore -f "Root" "$CAROOT\rootCA.pem"
+
+        # Verify
+        certutil -store "Root" | findstr mkcert
