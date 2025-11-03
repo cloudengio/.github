@@ -30,4 +30,4 @@ jobs:
         shell: pwsh
         run: |
           choco install mkcert
-          Start-Process mkcert -Wait -ArgumentList "-install" -Verb RunAs
+          certutil -addstore -f "Root" "$(mkcert -CAROOT)\rootCA.pem"
