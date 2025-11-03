@@ -25,5 +25,11 @@ runs:
       run: |
         choco install mkcert -y
         $CAROOT = mkcert -CAROOT
-        mkcert -install
-        certutil -addstore -f "Root" "$(mkcert -CAROOT)\rootCA.pem"
+
+        mkcert -cert-file "$CAROOT\rootCA.pem" -key-file "$CAROOT\rootCA-key.pem" localhost
+
+        # Trust the root certificate using certutil (no GUI)
+        certutil -addstore -f "Root" "$CAROOT\rootCA.pem"
+
+        # Verify
+        certutil -store "Root" | findstr mkcert
