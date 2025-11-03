@@ -6,10 +6,14 @@ on:
       os-version:
         type: string
         default: ubuntu-latest
-      go-version:
+      go-versions:
         type: string
-        description: "Go version to use"
-        default: "1.25.x"
+        description: 'Possibly multiple versions to test, as a json multi-line string ["1.15", "1.16"]'
+        default: |
+          [
+            "1.24.x",
+            "1.25.x" 
+          ]
 
 permissions:
   contents: read

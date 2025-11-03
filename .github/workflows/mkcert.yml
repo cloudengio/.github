@@ -29,5 +29,7 @@ jobs:
         working-directory: ${{ runner.temp }}
         shell: pwsh
         run: |
-          choco install mkcert
+          choco install mkcert -y
+          $CAROOT = mkcert -CAROOT
+          mkcert -install
           certutil -addstore -f "Root" "$(mkcert -CAROOT)\rootCA.pem"
