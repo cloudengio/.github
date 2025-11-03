@@ -17,8 +17,8 @@ jobs:
         run: |
           sudo apt-get install -y libnss3-tools
 
-      - name: build and run mkcert macos and Linux
-        if: ${{ runner.os == 'macos'  || runner.os == 'Linux' }}
+      - name: build and run mkcert macOS and Linux
+        if: ${{ runner.os == 'macOS'  || runner.os == 'Linux' }}
         working-directory: ${{ runner.temp }}
         run: |
           go install filippo.io/mkcert@latest

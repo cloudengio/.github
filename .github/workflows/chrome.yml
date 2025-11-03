@@ -52,8 +52,8 @@ jobs:
           & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --remote-debugging-port=9222 about:blank
           Start-Sleep -Seconds 5
 
-      - name: init chrome macos
-        if: ${{ runner.os == 'macos' }}
+      - name: init chrome macOS
+        if: ${{ runner.os == 'macOS' }}
         run: |
           /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
           /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &

@@ -27,8 +27,8 @@ jobs:
           Add-Content -Path $env:WINDIR\System32\drivers\etc\hosts -Value "127.0.0.1 pebble.example.com pebble-test.example.com"
         shell: pwsh
 
-      - name: init pebble hosts Linux or macos
-        if: ${{ runner.os == 'Linux' || runner.os == 'macos' }}
+      - name: init pebble hosts Linux or macOS
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
         run: |
           echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
 
