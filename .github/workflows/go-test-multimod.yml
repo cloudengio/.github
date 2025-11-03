@@ -99,6 +99,7 @@ jobs:
               break
             fi
             echo "⏳ Waiting for Default profile to be created... ($i)"
+            ls -l "$HOME/Library/Application Support/Google/Chrome/"
             sleep 1
           done
 
