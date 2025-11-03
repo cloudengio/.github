@@ -9,6 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: Set git to use LF
+      shell: pwsh
       if: ${{ runner.os == 'windows' }}
       run: |
         git config --global core.autocrlf false

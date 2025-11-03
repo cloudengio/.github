@@ -10,6 +10,7 @@ runs:
         install-dependencies: true
 
     - name: init chrome Linux
+      shell: bash
       if: ${{ runner.os == 'Linux' }}
       run: |
         chrome --version
@@ -34,6 +35,7 @@ runs:
           fi
 
     - name: init chrome Windows
+      shell: pwsh
       if: ${{ runner.os == 'Windows' }}
       run: |
         & "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
@@ -41,6 +43,7 @@ runs:
         Start-Sleep -Seconds 5
 
     - name: init chrome macOS
+      shell: bash
       if: ${{ runner.os == 'macOS' }}
       run: |
         /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
