@@ -61,8 +61,8 @@ jobs:
         with:
           install-dependencies: true
 
-      - name: init chrome
-        if: ${{ inputs.init-chrome }}
+      - name: init chrome linux
+        if: ${{ inputs.init-chrome && runner.os == 'linux' }}
         run: |
           chrome --version
           chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
@@ -85,6 +85,38 @@ jobs:
            fi
 
            kill $CHROME_PID
+
+      - name: init chrome macos
+        if: ${{ inputs.init-chrome && runner.os == 'macos' }}
+        run: |
+          /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
+          /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --remote-debugging-port=9222 about:blank &
+          CHROME_PID=$!
+
+          # Wait up to 30s for Chrome to create the NSS DB
+          for i in {1..30}; do
+            if [ -d "$HOME/.pki/nssdb" ]; then
+              echo "✅ NSS DB found"
+              break
+            fi
+            echo "⏳ Waiting for NSS DB to be created... ($i)"
+            sleep 1
+          done
+
+          if [ ! -d "$HOME/.pki/nssdb" ]; then
+            echo "❌ NSS DB was not created after 30s"
+            kill $CHROME_PID
+            exit 1
+          fi
+
+          kill $CHROME_PID
+
+      - name: init chrome windows
+        if: ${{ inputs.init-chrome && runner.os == 'windows' }}
+        run: |
+          & "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
+          & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --remote-debugging-port=9222 about:blank
+          Start-Sleep -Seconds 5
 
       - name: linux mkcert requirements
         if: ${{ runner.os == 'linux' }}
