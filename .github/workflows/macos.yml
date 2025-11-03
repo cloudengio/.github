@@ -13,12 +13,24 @@ env:
   OS_VERSION: macos-latest
 
 jobs:
-  init-chrome:
+  go:
+    uses: ./.github/workflows/go.yml
+    with:
+      os-version: ${{ env.OS_VERSION }}
+
+  chrome:
     uses: ./.github/workflows/init-chrome.yml
     with:
       os-version: ${{ env.OS_VERSION }}
 
   mkcert:
+    needs: go
     uses: ./.github/workflows/mkcert.yml
+    with:
+      os-version: ${{ env.OS_VERSION }}
+
+  pebble:
+    needs: go
+    uses: ./.github/workflows/pebble.yml
     with:
       os-version: ${{ env.OS_VERSION }}
