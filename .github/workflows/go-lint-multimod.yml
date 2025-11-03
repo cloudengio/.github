@@ -19,20 +19,11 @@ jobs:
     runs-on: ${{ inputs.os-version }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: ${{ inputs.go-version }}
-          cache-dependency-path: "**/*.sum"
-
-      - name: Install tools
-        run: |
-          go install cloudeng.io/citools/multimod@latest
-          go install golang.org/x/vuln/cmd/govulncheck@latest
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/go
+      - uses: ./.github/actions/mkcert
+      - uses: ./.github/actions/pebble
+      - uses: ./.github/actions/chrome
 
       - name: Test
         run: multimod --config=.multimod.yaml lint

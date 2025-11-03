@@ -51,7 +51,7 @@ runs:
         /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
         /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox about:blank &
 
-        #CHROME_PID=$!
+        CHROME_PID=$!
 
         #PROFILE_PATH="$HOME/Library/Application Support/Google/Chrome/Default"
 
