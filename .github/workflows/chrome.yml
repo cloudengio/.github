@@ -26,7 +26,7 @@ jobs:
         run: |
           chrome --version
           chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
-           CHROME_PID=$!
+           chROME_PID=$!
 
            # Wait up to 30s for Chrome to create the NSS DB
            for i in {1..30}; do
@@ -59,7 +59,7 @@ jobs:
           /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
           CHROME_PID=$!
 
-          # Wait up to 30s for Chrome to create the NSS DB
+          # Wait up to 30s for Chrome to create the default profile.
           for i in {1..30}; do
             if [ -d "$HOME/Library/Application Support/Google/Chrome/Default" ]; then
               echo "✅ Default profile created"

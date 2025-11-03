@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  chrome:
+  pebble:
     runs-on: ${{ inputs.os-version }}
 
     steps:
@@ -25,15 +25,24 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         run: |
           Add-Content -Path $env:WINDIR\System32\drivers\etc\hosts -Value "127.0.0.1 pebble.example.com pebble-test.example.com"
+          Get-Content -Path $env:WINDIR\System32\drivers\etc\hosts
         shell: pwsh
 
       - name: init pebble hosts Linux or macOS
         if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
         run: |
           echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
-
-      - name: test pebble hosts
-        run: |
           cat /etc/hosts
+
+      - name: test pebble hosts on Linux or macOS
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: |
           ping -c 2 pebble-test.example.com
           ping -c 2 pebble.example.com
+
+      - name: test pebble hosts on Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          ping -n 2 pebble-test.example.com
+          ping -n 2 pebble.example.com
+        shell: pwsh
