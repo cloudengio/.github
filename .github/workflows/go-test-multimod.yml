@@ -90,7 +90,7 @@ jobs:
         if: ${{ inputs.init-chrome && runner.os == 'macos' }}
         run: |
           /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
-          /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --remote-debugging-port=9222 about:blank &
+          /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
           CHROME_PID=$!
 
           # Wait up to 30s for Chrome to create the NSS DB
