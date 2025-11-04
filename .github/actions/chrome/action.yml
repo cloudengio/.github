@@ -48,7 +48,7 @@ runs:
       if: ${{ runner.os == 'macOS' }}
       run: |
         echo "Signing Chrome to satisfy macOS security..."
-        codesign --force --sign - "${{ steps.install_chrome.outputs.chrome-path }}"
+        codesign --force --sign - "${{ steps.setup-chrome.outputs.chrome-path }}"
 
     - name: init chrome macOS
       shell: bash
