@@ -45,7 +45,7 @@ runs:
       if: ${{ runner.os == 'macOS' }}
       run: |
         "${{ steps.setup-chrome.outputs.chrome-path }}" --version
-        "${{ steps.setup-chrome.outputs.chrome-path }}" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
+        "${{ steps.setup-chrome.outputs.chrome-path }}" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 --disable-dev-shm-usage about:blank &
         CHROME_PID=$!
         waitfor --initial=5s --interval=1s --total=30s "$HOME/Library/Application Support/Google/Chrome/Default"
         if [ $? -ne 0 ]; then
