@@ -16,7 +16,7 @@ runs:
       if: ${{ runner.os == 'Linux' }}
       run: |
         chrome --version
-        chrome --headless --disable-gpu --no-sandbox about:blank &
+        chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
           CHROME_PID=$!
           NSS_DB_PATH="$HOME/.pki/nssdb"
           # Wait up to 30s for Chrome to create the NSS DB
@@ -41,7 +41,7 @@ runs:
       if: ${{ runner.os == 'Windows' }}
       run: |
         & "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
-        & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu about:blank
+        & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --remote-debugging-port=9222 about:blank
         Start-Sleep -Seconds 5
 
     - name: init chrome macOS
@@ -49,7 +49,7 @@ runs:
       if: ${{ runner.os == 'macOS' }}
       run: |
         /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
-        /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox about:blank &
+        /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
 
         CHROME_PID=$!
 
