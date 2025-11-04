@@ -21,15 +21,11 @@ runs:
     - name: build and run mkcert Windows
       if: ${{ runner.os == 'Windows' }}
       shell: pwsh
-      working-directory: ${{ runner.temp }}
       run: |
         go install filippo.io/mkcert@latest
-        $CAROOT = mkcert -CAROOT
-
-        mkcert -cert-file "$CAROOT\rootCA.pem" -key-file "$CAROOT\rootCA-key.pem" localhost
-
-        # Trust the root certificate using certutil (no GUI)
-        certutil -addstore -f "Root" "$CAROOT\rootCA.pem"
-
+        $env:CAROOT = "$(pwd)/mkcert-ca"
+        New-Item -ItemType Directory -Force -Path $env:CAROOT
+        mkcert -install
+        certutil -addstore -f "Root" "$env:CAROOT\rootCA.pem"
         # Verify
         certutil -store "Root" | findstr mkcert
