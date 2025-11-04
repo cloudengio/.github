@@ -43,21 +43,22 @@ runs:
         }
         & "$goBinPath\waitfor.exe" --initial=5s --interval=1s --total=30s $profilePath
 
-    - name: sign chrome for macOS
-      shell: bash
-      if: ${{ runner.os == 'macOS' }}
-      run: |
-        echo "Signing Chrome to satisfy macOS security..."
-        codesign --force --sign - "${{ steps.setup-chrome.outputs.chrome-path }}"
-
     - name: init chrome macOS
       shell: bash
       if: ${{ runner.os == 'macOS' }}
       run: |
-        "${{ steps.setup-chrome.outputs.chrome-path }}" --version
-        "${{ steps.setup-chrome.outputs.chrome-path }}" --headless=new --disable-gpu --no-sandbox --remote-debugging-port=9222 --disable-dev-shm-usage about:blank &
+        CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
+        "$CHROME_PATH" --version
+        export HOME=/Users/runner
+        USERDATA_DIR="$HOME/Library/Application Support/Google/Chrome for Testing"
+        PROFILE_DIR="$USERDATA_DIR/Default"
+
+        mkdir -p "$PROFILE_DIR"
+
+        "$CHROME_PATH" --headless=new --disable-gpu --no-sandbox --remote-debugging-port=9222 --disable-dev-shm-usage --user-data-dir="$USERDATA_DIR" about:blank &
         CHROME_PID=$!
-        waitforfiles --initial=5s --interval=1s --total=30s "$HOME/Library/Application Support/Google/Chrome/Default"
+
+        waitforfiles --initial=5s --interval=1s --total=30s "$PROFILE_DIR"
         if [ $? -ne 0 ]; then
           kill $CHROME_PID
           exit 1
