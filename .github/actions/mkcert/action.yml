@@ -25,7 +25,9 @@ runs:
         go install filippo.io/mkcert@latest
         $env:CAROOT = "$(pwd)/mkcert-ca"
         New-Item -ItemType Directory -Force -Path $env:CAROOT
-        mkcert -install
+        # Create a cert to generate the CA files, but don't run install.
+        mkcert localhost
+        # Add the generated CA to the system's root store.
         certutil -addstore -f "Root" "$env:CAROOT\rootCA.pem"
         # Verify
         certutil -store "Root" | findstr mkcert
