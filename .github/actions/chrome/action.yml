@@ -1,5 +1,9 @@
 name: chrome
 description: "set up Chrome environment"
+outputs:
+  chrome-path:
+    description: "Path to the chrome executable"
+    value: ${{ steps.setup-chrome.outputs.chrome-path }}
 runs:
   using: "composite"
   steps:
@@ -7,7 +11,7 @@ runs:
       uses: browser-actions/setup-chrome@v2
       id: setup-chrome
       with:
-        #install-dependencies: true
+        install-dependencies: true
         chrome-version: stable
         install-chromedriver: true
 
@@ -20,13 +24,14 @@ runs:
           CHROME_PID=$!
           NSS_DB_PATH="$HOME/.pki/nssdb"
           # Wait up to 30s for Chrome to create the NSS DB
-          for i in {1..30}; do
+          sleep 5
+          for i in {1..25}; do
             if [ -d "$NSS_DB_PATH" ]; then
               echo "✅ NSS DB found"
               break
             fi
-          echo "⏳ Waiting for NSS DB to be created... ($i)"
-          sleep 1
+            echo "⏳ Waiting for NSS DB to be created... ($i)"
+            sleep 1
           done
 
           kill $CHROME_PID
@@ -53,24 +58,6 @@ runs:
 
         CHROME_PID=$!
 
-        #PROFILE_PATH="$HOME/Library/Application Support/Google/Chrome/Default"
-
-        # Wait up to 30s for Chrome to create the default profile.
-        #for i in {1..30}; do
-        #  if [ -d "$PROFILE_PATH" ]; then
-        #    echo "✅ Default profile created"
-        #    break
-        #  fi
-        #  echo "⏳ Waiting for Default profile to be created... ($i)"
-        #  sleep 1
-        #  ls -l "$(dirname "$PROFILE_PATH")" || true
-        #done
-
         sleep 5
 
         kill $CHROME_PID
-
-        #if [ ! -d "$PROFILE_PATH" ]; then
-        #  echo "❌ Default profile was not created after 30s"
-        #  exit 1
-        #fi
