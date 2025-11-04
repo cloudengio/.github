@@ -11,9 +11,9 @@ runs:
       uses: browser-actions/setup-chrome@v2
       id: setup-chrome
       with:
-        install-dependencies: true
+        #install-dependencies: true
         chrome-version: stable
-        install-chromedriver: true
+        #install-chromedriver: true
 
     - name: init chrome Linux
       shell: bash
@@ -33,8 +33,9 @@ runs:
       shell: pwsh
       if: ${{ runner.os == 'Windows' }}
       run: |
-        "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
-        & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --remote-debugging-port=9222 about:blank
+        $chromePath = "${env:ProgramFiles}\Google\Chrome\Application\chrome.exe"
+        (Get-Item "$chromePath").VersionInfo.ProductVersion
+        & "$chromePath" --headless --disable-gpu --remote-debugging-port=9222 about:blank
         $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
         if (waitfor --initial=5s --interval=1s --total=30s $profilePath) {
         } else {
