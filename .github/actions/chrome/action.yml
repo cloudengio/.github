@@ -22,32 +22,24 @@ runs:
         chrome --version
         chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
           CHROME_PID=$!
-          NSS_DB_PATH="$HOME/.pki/nssdb"
-          # Wait up to 30s for Chrome to create the NSS DB
-          sleep 5
-          for i in {1..25}; do
-            if [ -d "$NSS_DB_PATH" ]; then
-              echo "✅ NSS DB found"
-              break
-            fi
-            echo "⏳ Waiting for NSS DB to be created... ($i)"
-            sleep 1
-          done
-
-          kill $CHROME_PID
-
-          if [ ! -d "$NSS_DB_PATH" ]; then
-            echo "❌ NSS DB was not created after 30s"
+          waitfor --initial=5s --interval=1s --total=30s "$HOME/.pki/nssdb"
+          if [ $? -ne 0 ]; then
+            kill $CHROME_PID
             exit 1
           fi
+          kill $CHROME_PID
 
     - name: init chrome Windows
       shell: pwsh
       if: ${{ runner.os == 'Windows' }}
       run: |
-        & "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
+        "C:\Program Files\Google\Chrome\Application\chrome.exe" --version
         & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu --remote-debugging-port=9222 about:blank
-        Start-Sleep -Seconds 5
+        $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
+        if (waitfor --initial=5s --interval=1s --total=30s $profilePath) {
+        } else {
+          exit 1
+        }
 
     - name: init chrome macOS
       shell: bash
@@ -55,9 +47,10 @@ runs:
       run: |
         /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version
         /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
-
         CHROME_PID=$!
-
-        sleep 5
-
+        waitfor --initial=5s --interval=1s --total=30s "$HOME/Library/Application Support/Google/Chrome/Default"
+        if [ $? -ne 0 ]; then
+          kill $CHROME_PID
+          exit 1
+        fi
         kill $CHROME_PID

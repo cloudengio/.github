@@ -1,5 +1,5 @@
 name: mkcert
-description: "Install mkcert and set up local CA"
+description: "Install mkcert and set up local CA."
 
 runs:
   using: "composite"
