@@ -14,11 +14,16 @@ runs:
       if: ${{ runner.os == 'macOS' }}
       shell: bash
       run: |
-        brew install nss
         go install filippo.io/mkcert@latest
         CAROOT=$(mkcert -CAROOT)
         mkcert -install
         sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$CAROOT/rootCA.pem"
+
+        echo "\n--- Verifying mkcert CA in System Keychain ---"
+        sudo security find-certificate -a -c "mkcert" -p /Library/Keychains/System.keychain
+
+        echo "\n--- Checking trust settings for the mkcert CA ---"
+        sudo security verify-cert -c "$CAROOT/rootCA.pem" -L -R "trustRoot"
 
     - name: build and run mkcert Linux
       if: ${{ runner.os == 'Linux' }}
