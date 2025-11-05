@@ -4,6 +4,10 @@ outputs:
   chrome-path:
     description: "Path to the chrome executable"
     value: ${{ steps.setup-chrome.outputs.chrome-path }}
+  chrome-user-data-dir:
+    description: "Path to the chrome user data directory"
+    value: ${{ steps.chrome-user-data-dir.outputs.chrome-user-data-dir }}
+
 runs:
   using: "composite"
   steps:
@@ -15,6 +19,7 @@ runs:
 
     - name: init chrome Linux
       shell: bash
+      id: chrome-user-data-dir
       if: ${{ runner.os == 'Linux' }}
       run: |
         chrome --version
@@ -27,8 +32,12 @@ runs:
           fi
           kill $CHROME_PID
 
+          USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
+          echo "chrome-user-data-dir=$USERDATA_DIR" >> $GITHUB_OUTPUT
+
     - name: init chrome Windows
       shell: pwsh
+      id: chrome-user-data-dir
       if: ${{ runner.os == 'Windows' }}
       run: |
         $chromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
@@ -36,15 +45,18 @@ runs:
 
         & "$chromePath" --headless --disable-gpu --remote-debugging-port=9222 about:blank
         $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
+        echo "chrome-user-data-dir=$env:LOCALAPPDATA\Google\Chrome\User Data" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
         $goBinPath = (go env GOBIN)
         if (-not $goBinPath) {
           $goBinPath = (go env GOPATH) + "\bin"
         }
+
         & "$goBinPath\waitfor.exe" --initial=5s --interval=1s --total=30s $profilePath
 
     - name: init chrome macOS
       shell: bash
+      id: chrome-user-data-dir
       if: ${{ runner.os == 'macOS' }}
       run: |
         CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
@@ -52,15 +64,18 @@ runs:
         export HOME=/Users/runner
         USERDATA_DIR="$HOME/Library/Application Support/Google/Chrome for Testing"
         PROFILE_DIR="$USERDATA_DIR/Default"
+        echo $USERDATA_DIR
 
         mkdir -p "$PROFILE_DIR"
 
         "$CHROME_PATH" --headless=new --disable-gpu --no-sandbox --remote-debugging-port=9222 --disable-dev-shm-usage --user-data-dir="$USERDATA_DIR" about:blank &
         CHROME_PID=$!
 
-        waitforfiles --initial=5s --interval=1s --total=30s "$PROFILE_DIR"
+        waitforfiles --initial=2s --interval=1s --total=30s "$PROFILE_DIR"
         if [ $? -ne 0 ]; then
           kill $CHROME_PID
           exit 1
         fi
         kill $CHROME_PID
+
+        echo "chrome-user-data-dir=$USERDATA_DIR" >> $GITHUB_OUTPUT
