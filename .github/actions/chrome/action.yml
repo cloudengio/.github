@@ -40,11 +40,13 @@ runs:
       run: |
         $chromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
         & "$chromePath" --version
+
         $chromeDir = Split-Path -Parent $chromePath
-        icacls "$chromeDir" /grant "ALL APPLICATION PACKAGES":(OI)(CI)(RX) /grant "ALL RESTRICTED APPLICATION PACKAGES":(OI)(CI)(RX) /T /C | Out-Null
+        icacls "$chromeDir" /grant 'ALL APPLICATION PACKAGES:(OI)(CI)(RX)' /grant 'ALL RESTRICTED APPLICATION PACKAGES:(OI)(CI)(RX)' /T /C | Out-Null
         if ($LASTEXITCODE -ne 0) {
           throw "icacls failed to set sandbox permissions on $chromeDir"
         }
+
         $flags = @(
           "--headless",
           "--disable-gpu",
@@ -56,15 +58,16 @@ runs:
           "--disable-default-apps",
           "about:blank"
         )
+
         $process = Start-Process -FilePath "$chromePath" -ArgumentList $flags -PassThru
         $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
 
-        #$goBinPath = (go env GOBIN)
-        #if (-not $goBinPath) {
-        #  $goBinPath = (go env GOPATH) + "\bin"
-        #}
+        $goBinPath = (go env GOBIN)
+        if (-not $goBinPath) {
+          $goBinPath = (go env GOPATH) + "\bin"
+        }
 
-        & "waitforfiles.exe" --initial=5s --interval=1s --total=30s $profilePath
+        & "$goBinPath\waitforfiles.exe" --initial=5s --interval=1s --total=30s $profilePath
         Stop-Process -Id $process.Id -Force
 
     - name: init chrome macOS
