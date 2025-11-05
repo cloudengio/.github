@@ -25,7 +25,7 @@ runs:
         CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
         USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
         "$CHROME_PATH" --version
-        "$CHROME_PATH" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 --user-data-dir="$USERDATA_DIR" about:blank &
+        "$CHROME_PATH" --headless=new --disable-gpu --no-sandbox --remote-debugging-port=9222 --user-data-dir="$USERDATA_DIR" about:blank &
         CHROME_PID=$!
         waitforfiles --initial=5s --interval=1s --total=30s "$HOME/.pki/nssdb"
         if [ $? -ne 0 ]; then
