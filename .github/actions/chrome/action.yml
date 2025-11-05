@@ -41,26 +41,27 @@ runs:
         $chromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
         & "$chromePath" --version
 
+        # Set sandbox permissions
         $chromeDir = Split-Path -Parent $chromePath
         icacls "$chromeDir" /grant 'ALL APPLICATION PACKAGES:(OI)(CI)(RX)' /grant 'ALL RESTRICTED APPLICATION PACKAGES:(OI)(CI)(RX)' /T /C | Out-Null
         if ($LASTEXITCODE -ne 0) {
           throw "icacls failed to set sandbox permissions on $chromeDir"
         }
 
+        $userDataDir = Join-Path $env:RUNNER_TEMP "chrome-user-data"
+        $profilePath = Join-Path $userDataDir "Default"
+
         $flags = @(
           "--headless",
           "--disable-gpu",
           "--no-sandbox",
           "--remote-debugging-port=9222",
-          "--disable-features=Translate,MediaRouter,OptimizationHints,Prerender2",
-          "--disable-background-networking",
-          "--disable-sync",
-          "--disable-default-apps",
+          "--user-data-dir=$userDataDir",
           "about:blank"
         )
 
         $process = Start-Process -FilePath "$chromePath" -ArgumentList $flags -PassThru
-        $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
+        #$profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
 
         $goBinPath = (go env GOBIN)
         if (-not $goBinPath) {
@@ -104,5 +105,6 @@ runs:
           USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
           echo "chrome-user-data-dir=$USERDATA_DIR" >> $GITHUB_OUTPUT
         elif [[ "$RUNNER_OS" == "Windows" ]]; then
-          echo "chrome-user-data-dir=$env:LOCALAPPDATA\Google\Chrome\User Data" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          $userDataDir = Join-Path $env:RUNNER_TEMP "chrome-user-data"
+          echo "chrome-user-data-dir=$userDataDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
         fi
