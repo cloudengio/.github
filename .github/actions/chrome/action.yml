@@ -40,7 +40,7 @@ runs:
         $chromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
         (Get-Item "$chromePath").VersionInfo.ProductVersion
 
-        & "$chromePath" --headless --disable-gpu --remote-debugging-port=9222 about:blank
+        & "$chromePath" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank
         $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
 
 
