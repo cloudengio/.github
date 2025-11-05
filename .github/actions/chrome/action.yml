@@ -38,8 +38,18 @@ runs:
       shell: pwsh
       if: ${{ runner.os == 'Windows' }}
       run: |
-        $chromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
-        & "$chromePath" --version
+        $originalChromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
+        & "$originalChromePath" --version
+
+        $originalChromeDir = Split-Path -Parent $originalChromePath
+        $tempChromeBase = Join-Path $env:RUNNER_TEMP "chrome-launch"
+        if (Test-Path $tempChromeBase) {
+          Remove-Item -Path $tempChromeBase -Recurse -Force
+        }
+        New-Item -Path $tempChromeBase -ItemType Directory | Out-Null
+        Get-ChildItem -Path $originalChromeDir -Force | Copy-Item -Destination $tempChromeBase -Recurse -Force
+        $chromePath = Join-Path $tempChromeBase "chrome.exe"
+
         $flags = @(
           "--headless",
           "--disable-gpu",
@@ -49,19 +59,28 @@ runs:
           "--disable-background-networking",
           "--disable-sync",
           "--disable-default-apps",
+          "--user-data-dir=$env:LOCALAPPDATA\Google\Chrome\User Data",
           "about:blank"
         )
+
         $process = Start-Process -FilePath "$chromePath" -ArgumentList $flags -PassThru
-        $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
+        try {
+          $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
 
+          $goBinPath = (go env GOBIN)
+          if (-not $goBinPath) {
+            $goBinPath = (go env GOPATH) + "\bin"
+          }
 
-        $goBinPath = (go env GOBIN)
-        if (-not $goBinPath) {
-          $goBinPath = (go env GOPATH) + "\bin"
+          & "$goBinPath\waitforfiles.exe" --initial=5s --interval=1s --total=30s $profilePath
+          if ($LASTEXITCODE -ne 0) {
+            throw "waitforfiles.exe timed out waiting for $profilePath"
+          }
+        } finally {
+          if ($process -and -not $process.HasExited) {
+            Stop-Process -Id $process.Id -Force
+          }
         }
-
-        & "$goBinPath\waitforfiles.exe" --initial=5s --interval=1s --total=30s $profilePath
-        Stop-Process -Id $process.Id -Force
 
     - name: init chrome macOS
       shell: bash
