@@ -49,7 +49,7 @@ runs:
           $goBinPath = (go env GOPATH) + "\bin"
         }
 
-        & "$goBinPath\waitfor.exe" --initial=5s --interval=1s --total=30s $profilePath
+        & "$goBinPath\waitforfiles.exe" --initial=5s --interval=1s --total=30s $profilePath
 
     - name: init chrome macOS
       shell: bash

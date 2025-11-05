@@ -14,6 +14,7 @@ runs:
       if: ${{ runner.os == 'macOS' }}
       shell: bash
       run: |
+        brew install nss
         go install filippo.io/mkcert@latest
         CAROOT=$(mkcert -CAROOT)
         mkcert -install
