@@ -6,9 +6,7 @@ outputs:
     value: ${{ steps.setup-chrome.outputs.chrome-path }}
   chrome-user-data-dir:
     description: "Path to the chrome user data directory"
-    value: ${{ coalesce(steps.init-windows.outputs.user-data-dir,
-      steps.init-macos.outputs.user-data-dir,
-      steps.init-linux.outputs.user-data-dir) }}
+    value: ${{ steps.resolve-user-data.outputs.chrome-user-data-dir }}
 
 runs:
   using: "composite"
@@ -104,3 +102,15 @@ runs:
         kill $CHROME_PID
 
         echo "user-data-dir=$USERDATA_DIR" >> "$GITHUB_OUTPUT"
+
+    - name: resolve chrome user data dir
+      id: resolve-user-data
+      shell: bash
+      run: |
+        for value in "${{ steps.init-windows.outputs.user-data-dir }}" "${{ steps.init-macos.outputs.user-data-dir }}" "${{ steps.init-linux.outputs.user-data-dir }}"; do
+          if [ -n "$value" ]; then
+            echo "chrome-user-data-dir=$value" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+        done
+        echo "chrome-user-data-dir=" >> "$GITHUB_OUTPUT"
