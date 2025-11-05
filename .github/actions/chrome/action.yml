@@ -25,7 +25,7 @@ runs:
         CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
         USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
         "$CHROME_PATH" --version
-        "$CHROME_PATH" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 --user-data-dir="$USERDATA_DIR" about:blank &
+        "$CHROME_PATH" --headles=new --disable-gpu --no-sandbox --remote-debugging-port=9222 --user-data-dir="$USERDATA_DIR" about:blank &
         CHROME_PID=$!
         waitforfiles --initial=5s --interval=1s --total=30s "$HOME/.pki/nssdb"
         if [ $? -ne 0 ]; then
@@ -57,7 +57,7 @@ runs:
         $profilePath = Join-Path $userDataDir "Default"
 
         $flags = @(
-          "--headless",
+          "--headless=new",
           "--disable-gpu",
           "--no-sandbox",
           "--remote-debugging-port=9222",
@@ -84,14 +84,24 @@ runs:
       run: |
         CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
         "$CHROME_PATH" --version
-        export HOME=/Users/runner
-        USERDATA_DIR="$HOME/Library/Application Support/Google/Chrome for Testing"
-        PROFILE_DIR="$USERDATA_DIR/Default"
-        echo $USERDATA_DIR
 
+        USERDATA_DIR="$RUNNER_TEMP/chrome-user-data"
+        PROFILE_DIR="$USERDATA_DIR/Default"
         mkdir -p "$PROFILE_DIR"
 
-        "$CHROME_PATH" --headless=new --disable-gpu --no-sandbox --remote-debugging-port=9222 --disable-dev-shm-usage --user-data-dir="$USERDATA_DIR" about:blank &
+        "$CHROME_PATH" \
+          --headless=new \
+          --no-sandbox \
+          --disable-setuid-sandbox \
+          --disable-dev-shm-usage \
+          --disable-gpu \
+          --no-first-run \
+          --no-default-browser-check \
+          --use-mock-keychain \
+          --disable-background-networking \
+          --remote-allow-origins='*' \
+          --user-data-dir="$USERDATA_DIR" \
+          about:blank &
         CHROME_PID=$!
 
         waitforfiles --initial=2s --interval=1s --total=30s "$PROFILE_DIR"
