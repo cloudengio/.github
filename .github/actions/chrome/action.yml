@@ -39,9 +39,19 @@ runs:
       if: ${{ runner.os == 'Windows' }}
       run: |
         $chromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
-        (Get-Item "$chromePath").VersionInfo.ProductVersion
-
-        & "$chromePath" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank
+        & "$chromePath" --version
+        $flags = @(
+          "--headless",
+          "--disable-gpu",
+          "--no-sandbox",
+          "--remote-debugging-port=9222",
+          "--disable-features=Translate,MediaRouter,OptimizationHints,Prerender2",
+          "--disable-background-networking",
+          "--disable-sync",
+          "--disable-default-apps",
+          "about:blank"
+        )
+        $process = Start-Process -FilePath "$chromePath" -ArgumentList $flags -PassThru
         $profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
 
 
@@ -51,6 +61,7 @@ runs:
         }
 
         & "$goBinPath\waitforfiles.exe" --initial=5s --interval=1s --total=30s $profilePath
+        Stop-Process -Id $process.Id -Force
 
     - name: init chrome macOS
       shell: bash
