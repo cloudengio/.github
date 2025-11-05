@@ -6,7 +6,9 @@ outputs:
     value: ${{ steps.setup-chrome.outputs.chrome-path }}
   chrome-user-data-dir:
     description: "Path to the chrome user data directory"
-    value: ${{ steps.chrome-user-data-dir.outputs.chrome-user-data-dir }}
+    value: ${{ coalesce(steps.init-windows.outputs.user-data-dir,
+      steps.init-macos.outputs.user-data-dir,
+      steps.init-linux.outputs.user-data-dir) }}
 
 runs:
   using: "composite"
@@ -19,6 +21,7 @@ runs:
 
     - name: init chrome Linux
       shell: bash
+      id: init-linux
       if: ${{ runner.os == 'Linux' }}
       run: |
         CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
@@ -30,12 +33,16 @@ runs:
           kill $CHROME_PID
             exit 1
           fi
-          kill $CHROME_PID
+        kill $CHROME_PID
 
-          USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
+        USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
+        # this should already exist.
+        waitforfiles --interval=0 --total=0 "$USERDATA_DIR/Default"
+        echo "user-data-dir=$USERDATA_DIR" >> "$GITHUB_OUTPUT"
 
     - name: init chrome Windows
       shell: pwsh
+      id: init-windows
       if: ${{ runner.os == 'Windows' }}
       run: |
         $chromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
@@ -70,9 +77,11 @@ runs:
 
         & "$goBinPath\waitforfiles.exe" --initial=5s --interval=1s --total=30s $profilePath
         Stop-Process -Id $process.Id -Force
+        "user-data-dir=$userDataDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
     - name: init chrome macOS
       shell: bash
+      id: init-macos
       if: ${{ runner.os == 'macOS' }}
       run: |
         CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
@@ -94,17 +103,4 @@ runs:
         fi
         kill $CHROME_PID
 
-    - name: chrome user data dir outputs
-      shell: bash
-      id: chrome-user-data-dir
-      run: |
-        if [[ "$RUNNER_OS" == "macOS" ]]; then
-          USERDATA_DIR="/Users/runner/Library/Application Support/Google/Chrome for Testing"
-          echo "chrome-user-data-dir=$USERDATA_DIR" >> $GITHUB_OUTPUT
-        elif [[ "$RUNNER_OS" == "Linux" ]]; then
-          USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
-          echo "chrome-user-data-dir=$USERDATA_DIR" >> $GITHUB_OUTPUT
-        elif [[ "$RUNNER_OS" == "Windows" ]]; then
-          $userDataDir = Join-Path $env:RUNNER_TEMP "chrome-user-data"
-          echo "chrome-user-data-dir=$userDataDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-        fi
+        echo "user-data-dir=$USERDATA_DIR" >> "$GITHUB_OUTPUT"
