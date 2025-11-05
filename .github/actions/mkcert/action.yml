@@ -10,8 +10,17 @@ runs:
       run: |
         sudo apt-get install -y libnss3-tools
 
-    - name: build and run mkcert macOS and Linux
-      if: ${{ runner.os == 'macOS'  || runner.os == 'Linux' }}
+    - name: build and run mkcert macOS
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      run: |
+        go install filippo.io/mkcert@latest
+        CAROOT=$(mkcert -CAROOT)
+        mkcert -install
+        sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "$CAROOT/rootCA.pem"
+
+    - name: build and run mkcert Linux
+      if: ${{ runner.os == 'Linux' }}
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
