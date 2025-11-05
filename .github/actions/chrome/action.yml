@@ -21,12 +21,13 @@ runs:
       shell: bash
       if: ${{ runner.os == 'Linux' }}
       run: |
-        chrome --version
-        chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
-          CHROME_PID=$!
-          waitforfiles --initial=5s --interval=1s --total=30s "$HOME/.pki/nssdb"
-          if [ $? -ne 0 ]; then
-            kill $CHROME_PID
+        CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
+        "$CHROME_PATH" --version
+        "$CHROME_PATH" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
+        CHROME_PID=$!
+        waitforfiles --initial=5s --interval=1s --total=30s "$HOME/.pki/nssdb"
+        if [ $? -ne 0 ]; then
+          kill $CHROME_PID
             exit 1
           fi
           kill $CHROME_PID
