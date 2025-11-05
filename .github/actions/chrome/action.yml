@@ -23,8 +23,9 @@ runs:
       if: ${{ runner.os == 'Linux' }}
       run: |
         CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
+        USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
         "$CHROME_PATH" --version
-        "$CHROME_PATH" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 about:blank &
+        "$CHROME_PATH" --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 --user-data-dir="$USERDATA_DIR" about:blank &
         CHROME_PID=$!
         waitforfiles --initial=5s --interval=1s --total=30s "$HOME/.pki/nssdb"
         if [ $? -ne 0 ]; then
@@ -33,7 +34,6 @@ runs:
           fi
         kill $CHROME_PID
 
-        USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
         # this should already exist.
         waitforfiles --interval=0 --total=0 "$USERDATA_DIR/Default"
         echo "user-data-dir=$USERDATA_DIR" >> "$GITHUB_OUTPUT"
