@@ -12,7 +12,7 @@ runs:
   using: "composite"
   steps:
     - name: install chrome for testing on Linux and Windows
-      if: ${{ runner.os != 'MacOS' }}
+      if: ${{ runner.os != 'macOS' }}
       uses: browser-actions/setup-chrome@v2
       id: setup-chrome
       with:
