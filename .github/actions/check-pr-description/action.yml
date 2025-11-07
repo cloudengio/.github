@@ -1,0 +1,28 @@
+name: Check PR Description
+description: Check if PR description contains a specific phrase or pattern
+
+inputs:
+  phrase:
+    description: "Phrase or regex pattern to search for in PR description (case-insensitive)"
+    required: true
+  pr-body:
+    description: "Pull request body text"
+    required: true
+
+outputs:
+  contains-pattern:
+    description: "Whether the PR description contains the phrase or matches the pattern (true/false)"
+    value: ${{ steps.check.outputs.contains-pattern }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check for phrase in PR description
+      id: check
+      shell: bash
+      run: |
+        if echo "${{ inputs.pr-body }}" | grep -qiE "${{ inputs.phrase }}"; then
+          echo "contains-pattern=true" >> $GITHUB_OUTPUT
+        else
+          echo "contains-pattern=false" >> $GITHUB_OUTPUT
+        fi
