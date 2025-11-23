@@ -15,7 +15,7 @@ runs:
   using: "composite"
   steps:
     - shell: bash
-      if: inputs.provisioning-profile-base64 != "" && inputs.provisioning-profile-location != ""
+      if: ${{ inputs.provisioning-profile-base64 != "" && inputs.provisioning-profile-location != "" }}
       run: |
         if [[ "${{ inputs.provisioning-profile-location }}" == *..* ]]; then
           echo "Error: Path traversal detected in provisioning-profile-location." >&2
@@ -23,7 +23,7 @@ runs:
         fi
         echo -n ${{ inputs.provisioning-profile-base64 }} | base64 --decode -o $RUNNER_TEMP/${{ inputs.provisioning-profile-location }}
     - shell: bash
-      if: runner.os == 'macOS'
+      if: ${{ runner.os == 'macOS' }}
       run: |
         echo "${{ inputs.certificate-p12-base64 }}" | base64 --decode > $RUNNER_TEMP/certificate.p12
         PASSWORD=$(openssl rand -base64 12)
