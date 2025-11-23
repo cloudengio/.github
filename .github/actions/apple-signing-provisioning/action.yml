@@ -1,26 +1,31 @@
 name: apple signing and provisioning support
 description: install apple signing certificate and provisioning profile
 inputs:
-  provisioning-profile-location:
-    description: whether and where to install the provisioning profile
+  provisioning-profile-base64:
+    description: "Base64 encoded provisioning profile"
     required: false
-    default: ""
-
+  provisioning-profile-location:
+    description: "Path to install the provisioning profile"
+    required: false
+    default: "provisioning.profile"
+  certificate-p12-base64:
+    description: "Base64 encoded P12 certificate"
+    required: true
 runs:
   using: "composite"
   steps:
     - shell: bash
-      if: inputs.provisioning-profile-location != ""
+      if: inputs.provisioning-profile-base64 != "" && inputs.provisioning-profile-location != ""
       run: |
         if [[ "${{ inputs.provisioning-profile-location }}" == *..* ]]; then
           echo "Error: Path traversal detected in provisioning-profile-location." >&2
           exit 1
         fi
-        echo -n ${{ secrets.APPLE_PROVISIONING_PROFILE }} | base64 --decode -o $RUNNER_TEMP/$${inputs.provisioning-profile-location}
+        echo -n ${{ inputs.provisioning-profile-base64 }} | base64 --decode -o $RUNNER_TEMP/${{ inputs.provisioning-profile-location }}
     - shell: bash
       if: runner.os == 'macOS'
       run: |
-        echo "${{ secrets.APPLE_SIGNING_CERTIFICATE }}" | base64 --decode > $RUNNER_TEMP/certificate.p12
+        echo "${{ inputs.certificate-p12-base64 }}" | base64 --decode > $RUNNER_TEMP/certificate.p12
         PASSWORD=$(openssl rand -base64 12)
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
         security create-keychain -p $PASSWORD $KEYCHAIN_PATH
