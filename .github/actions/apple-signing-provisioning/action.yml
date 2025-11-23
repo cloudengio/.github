@@ -36,6 +36,6 @@ runs:
         security list-keychain 
         security set-keychain-settings -t 3600 -u $KEYCHAIN_PATH
         security unlock-keychain -p $PASSWORD $KEYCHAIN_PATH
-        security import $RUNNER_TEMP/certificate.p12 -P ${{ inputs.certificate-password }} -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security import $RUNNER_TEMP/certificate.p12 -P $PASSWORD -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
         security list-keychain -d user -s $KEYCHAIN_PATH
         ls $RUNNER_TEMP
