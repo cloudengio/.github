@@ -15,7 +15,7 @@ runs:
   using: "composite"
   steps:
     - shell: bash
-      if: ${{ inputs.provisioning-profile-base64 != "" && inputs.provisioning-profile-location != "" }}
+      if: ${{ inputs.provisioning-profile-base64 != '' && inputs.provisioning-profile-location != '' }}
       run: |
         if [[ "${{ inputs.provisioning-profile-location }}" == *..* ]]; then
           echo "Error: Path traversal detected in provisioning-profile-location." >&2
