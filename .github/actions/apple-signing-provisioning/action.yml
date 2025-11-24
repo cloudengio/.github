@@ -28,13 +28,10 @@ runs:
         set -x
         echo "${{ inputs.certificate-p12-base64 }}" | base64 --decode > $RUNNER_TEMP/certificate.p12
         PASSWORD=$(openssl rand -base64 12)
-        echo passwrd __ $PASSWORD __
         KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
         echo $KEYCHAIN_PATH
         security create-keychain -p $PASSWORD $KEYCHAIN_PATH
-        echo "Created keychain at $KEYCHAIN_PATH"
         security list-keychain 
-        security set-keychain-settings -t 3600 -u $KEYCHAIN_PATH
         security unlock-keychain -p $PASSWORD $KEYCHAIN_PATH
         security import $RUNNER_TEMP/certificate.p12 -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-        security list-keychain -d user -s $KEYCHAIN_PATH
+        security list-keychain -d user
