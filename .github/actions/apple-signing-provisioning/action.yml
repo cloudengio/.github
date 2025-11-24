@@ -32,5 +32,6 @@ runs:
         security create-keychain -p $PASSWORD $KEYCHAIN_PATH
         security unlock-keychain -p $PASSWORD $KEYCHAIN_PATH
         security import $RUNNER_TEMP/certificate.p12 -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-        security list-keychain -d user -s $KEYCHAIN_PATH
+        security list-keychain -d user -s $KEYCHAIN_PATH # Add the new keychain to the search path
         security list-keychain -d user
+        security list-keychain
