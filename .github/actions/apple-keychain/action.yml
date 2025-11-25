@@ -1,5 +1,5 @@
-name: apple signing support
-description: create a file base keychain
+name: apple keychain support
+description: create a file based keychain, note the search path and default keychains are not modified by this action.
 inputs:
   keychain-name:
     description: "Name of the keychain to create"
@@ -30,7 +30,6 @@ runs:
         KEYCHAIN_PATH=$RUNNER_TEMP/${{ inputs.keychain-name }}
         security create-keychain -p $PASSWORD $KEYCHAIN_PATH
         security unlock-keychain -p $PASSWORD $KEYCHAIN_PATH
-        security list-keychains -d user -s $KEYCHAIN_PATH # Add the new keychain to the search path
         echo "${{ inputs.certificate-p12-base64 }}" | base64 --decode > $RUNNER_TEMP/certificate.p12
         security import $RUNNER_TEMP/certificate.p12 -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
         rm -f $RUNNER_TEMP/certificate.p12
