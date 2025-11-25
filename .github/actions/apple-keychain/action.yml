@@ -1,5 +1,5 @@
 name: apple keychain support
-description: create a file based keychain, note the search path and default keychains are not modified by this action.
+description: create a file based keychain, note the search path and default keychains are modified to use the created keychain
 inputs:
   keychain-name:
     description: "Name of the keychain to create"
@@ -16,9 +16,24 @@ outputs:
   keychain-path:
     description: "Path to the created keychain"
     value: ${{ steps.create-keychain.outputs.keychain-path }}
+  system-user-keychain:
+    description: "The prior user keychain before this action was run"
+    value: ${{ steps.previous-values.outputs.system_user_keychain }}
+  system-default-keychain:
+    description: "The prior default keychain before this action was run"
+    value: ${{ steps.previous-values.outputs.default_keychain }}
 runs:
   using: "composite"
   steps:
+    - shell: bash
+      id: previous-values
+      if: ${{ runner.os == 'macOS' }}
+      run: |
+        USER_KEYCHAIN=$(security list-keychain -d user | tr -d '"' | sed 's/^ *//')
+        DEFAULT_KEYCHAIN=$(security default-keychain | tr -d '"' | sed 's/^ *//')
+        echo "system_user_keychain=$USER_KEYCHAIN" >> "$GITHUB_OUTPUT"
+        echo "system_default_keychain=$DEFAULT_KEYCHAIN" >> "$GITHUB_OUTPUT"
+
     - shell: bash
       id: create-keychain
       if: ${{ runner.os == 'macOS' }}
@@ -34,3 +49,6 @@ runs:
         security import $RUNNER_TEMP/certificate.p12 -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
         rm -f $RUNNER_TEMP/certificate.p12
         echo "keychain-path=$KEYCHAIN_PATH" >> "$GITHUB_OUTPUT"
+
+        security list-keychains -d user -s $KEYCHAIN_PATH # Add the new keychain to the search path
+        security default-keychain -s $KEYCHAIN_PATH
