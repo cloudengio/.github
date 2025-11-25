@@ -12,10 +12,15 @@ inputs:
   certificate-p12-base64:
     description: "Base64 encoded P12 certificate"
     required: false
+outputs:
+  keychain-path:
+    description: "Path to the created keychain"
+    value: ${{ steps.create-keychain.outputs.keychain-path }}
 runs:
   using: "composite"
   steps:
     - shell: bash
+      id: create-keychain
       if: ${{ runner.os == 'macOS' }}
       run: |
         PASSWORD=${{ inputs.keychain-password }}
@@ -26,4 +31,7 @@ runs:
         security create-keychain -p $PASSWORD $KEYCHAIN_PATH
         security unlock-keychain -p $PASSWORD $KEYCHAIN_PATH
         security list-keychains -d user -s $KEYCHAIN_PATH # Add the new keychain to the search path
+        echo "${{ inputs.certificate-p12-base64 }}" | base64 --decode > $RUNNER_TEMP/certificate.p12
         security import $RUNNER_TEMP/certificate.p12 -P $PASSWORD -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        rm -f $RUNNER_TEMP/certificate.p12
+        echo "keychain-path=$KEYCHAIN_PATH" >> "$GITHUB_OUTPUT"
