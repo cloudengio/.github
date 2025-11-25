@@ -1,0 +1,25 @@
+name: apple signing support
+description: create a file base keychain
+inputs:
+  keychain-name:
+    description: "Name of the keychain to create"
+    required: false
+    default: "keychain-ci-testing.keychain-db"
+  keychain-password:
+    description: "Password for the keychain, a random one will be generated if not provided"
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      if: ${{ runner.os == 'macOS' }}
+      run: |
+        PASSWORD=${{ inputs.keychain-password }}
+        if [ -z "$PASSWORD" ]; then
+          PASSWORD=$(openssl rand -base64 12)
+        fi
+        KEYCHAIN_PATH=$RUNNER_TEMP/${{ inputs.keychain-name }}
+        security create-keychain -p $PASSWORD $KEYCHAIN_PATH
+        security unlock-keychain -p $PASSWORD $KEYCHAIN_PATH
+        security list-keychains -d user -s $KEYCHAIN_PATH # Add the new keychain to the search path

@@ -1,0 +1,21 @@
+name: apple provisioning profile support
+description: install a provisioning profile
+inputs:
+  provisioning-profile-base64:
+    description: "Base64 encoded provisioning profile"
+    required: false
+  provisioning-profile-location:
+    description: "Path to install the provisioning profile"
+    required: false
+    default: "provisioning.profile"
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      if: ${{ inputs.provisioning-profile-base64 != '' && inputs.provisioning-profile-location != '' }}
+      run: |
+        if [[ "${{ inputs.provisioning-profile-location }}" == *..* ]]; then
+          echo "Error: Path traversal detected in provisioning-profile-location." >&2
+          exit 1
+        fi
+        echo -n ${{ inputs.provisioning-profile-base64 }} | base64 --decode -o $RUNNER_TEMP/${{ inputs.provisioning-profile-location }}
