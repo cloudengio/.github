@@ -31,6 +31,8 @@ runs:
       run: |
         USER_KEYCHAIN=$(security list-keychain -d user | tr -d '"' | sed 's/^ *//')
         DEFAULT_KEYCHAIN=$(security default-keychain | tr -d '"' | sed 's/^ *//')
+        echo "system_user_keychain=$USER_KEYCHAIN"
+        echo "system_default_keychain=$DEFAULT_KEYCHAIN"
         echo "system_user_keychain=$USER_KEYCHAIN" >> "$GITHUB_OUTPUT"
         echo "system_default_keychain=$DEFAULT_KEYCHAIN" >> "$GITHUB_OUTPUT"
 
