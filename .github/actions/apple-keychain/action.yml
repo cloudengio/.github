@@ -21,7 +21,7 @@ outputs:
     value: ${{ steps.previous-values.outputs.system_user_keychain }}
   system-default-keychain:
     description: "The prior default keychain before this action was run"
-    value: ${{ steps.previous-values.outputs.default_keychain }}
+    value: ${{ steps.previous-values.outputs.system_default_keychain }}
 runs:
   using: "composite"
   steps:
