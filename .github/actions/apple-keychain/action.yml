@@ -46,6 +46,7 @@ runs:
         fi
         KEYCHAIN_PATH=$RUNNER_TEMP/${{ inputs.keychain-name }}
         security create-keychain -p $PASSWORD $KEYCHAIN_PATH
+        chmod 600 $KEYCHAIN_PATH
         security unlock-keychain -p $PASSWORD $KEYCHAIN_PATH
         echo "${{ inputs.certificate-p12-base64 }}" | base64 --decode > $RUNNER_TEMP/certificate.p12
         security import $RUNNER_TEMP/certificate.p12 -P "" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
