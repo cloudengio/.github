@@ -21,8 +21,14 @@ runs:
       if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       shell: bash
       run: |
-        echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts || true
-        cat /etc/hosts
+        if grep -q "pebble.example.com" /etc/hosts; then
+          # can't use sudo on locally hosted runners, we must be
+          # preconfigured with this entry
+          echo "pebble.example.com already exists in /etc/hosts"
+        else
+          echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
+          cat /etc/hosts
+        fi
 
     - name: test pebble hosts on Linux or macOS
       shell: bash
