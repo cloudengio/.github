@@ -7,16 +7,19 @@ on:
         type: string
         description: "go version to lint with"
         default: "stable"
-      os-version:
+      runner:
         type: string
-        default: ubuntu-latest
+        default: |
+          [
+            "ubuntu-latest"
+          ]
 
 permissions:
   contents: read
 
 jobs:
   test:
-    runs-on: ${{ inputs.os-version }}
+    runs-on: ${{ fromJson(inputs.runner) }}
 
     steps:
       - uses: actions/checkout@v5
