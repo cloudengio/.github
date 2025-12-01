@@ -21,7 +21,7 @@ runs:
       if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       shell: bash
       run: |
-        echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
+        echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts || true
         cat /etc/hosts
 
     - name: test pebble hosts on Linux or macOS
