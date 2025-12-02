@@ -35,10 +35,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: cloudengio/.github/.github/actions/go@main
-      - uses: cloudengio/.github/.github/actions/pebble@main
-      - uses: cloudengio/.github/.github/actions/chrome@main
+      - uses: cloudengio/.github/.github/actions/pebble@@locally-hosted-runners
+      - uses: cloudengio/.github/.github/actions/chrome@@locally-hosted-runners
         id: setup-chrome
-      - uses: cloudengio/.github/.github/actions/mkcert@main
+      - uses: cloudengio/.github/.github/actions/mkcert@@locally-hosted-runners
 
       - name: test
         env:
