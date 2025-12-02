@@ -11,13 +11,18 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: install chrome for testing on Linux and Windows
-      #if: ${{ runner.os != 'macOS' && runner.environment != 'self-hosted' }}
-      uses: browser-actions/setup-chrome@v2
+    - name: install chrome for testing #on Linux and Windows
+      shell: bash
       id: setup-chrome
-      with:
-        install-dependencies: true
-        chrome-version: stable
+      run: |
+        go install github.com/cloudengio/citools/chrome-for-testing/cmd/chrome-for-testing@chrome-for-testing
+        chrome-for-testing --channel=stable install
+      #if: ${{ runner.os != 'macOS' && runner.environment != 'self-hosted' }}
+      #uses: browser-actions/setup-chrome@v2.1.0
+      #id: setup-chrome
+      #with:
+      #  install-dependencies: true
+      #  chrome-version: stable
 
     - name: resolve chrome user data dir
       id: user-data-dir
