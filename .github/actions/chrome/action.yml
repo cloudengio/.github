@@ -18,7 +18,7 @@ runs:
         git clone --single-branch --branch chrome-for-testing https://github.com/cloudengio/citools.git $RUNNER_TEMP/citools
         (cd $RUNNER_TEMP/citools/chrome-for-testing && go install .)
         #go install cloudeng.io/citools/chrome-for-testing@latest
-        chrome-for-testing install --channel=stable --application=chrome
+        chrome-for-testing install --channel=stable --application=chrome --debug
       #if: ${{ runner.os != 'macOS' && runner.environment != 'self-hosted' }}
       #uses: browser-actions/setup-chrome@v2.1.0
       #id: setup-chrome
