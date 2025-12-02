@@ -15,7 +15,7 @@ runs:
       shell: bash
       id: setup-chrome
       run: |
-        go install github.com/cloudengio/citools/chrome-for-testing/cmd/chrome-for-testing@chrome-for-testing
+        go install cloudeng.io/citools/chrome-for-testing/cmd/chrome-for-testing@chrome-for-testing
         chrome-for-testing --channel=stable install
       #if: ${{ runner.os != 'macOS' && runner.environment != 'self-hosted' }}
       #uses: browser-actions/setup-chrome@v2.1.0
