@@ -33,6 +33,7 @@ runs:
         $chromePath = "C:\hostedtoolcache\windows\setup-chrome\chrome\stable\x64\chrome.exe" #"${{ steps.setup-chrome.outputs.chrome-path }}"
         $chromeDir = Split-Path -Parent $chromePath
         icacls "$chromeDir" /grant 'ALL APPLICATION PACKAGES:(OI)(CI)(RX)' /grant 'ALL RESTRICTED APPLICATION PACKAGES:(OI)(CI)(RX)' /T /C | Out-Null
+        $chromePath --version --headless=new
 
       #if: ${{ runner.os != 'macOS' && runner.environment != 'self-hosted' }}
       #uses: browser-actions/setup-chrome@v2.1.0
