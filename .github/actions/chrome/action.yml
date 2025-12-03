@@ -23,8 +23,8 @@ runs:
     - name: resolve chrome user data dir
       shell: bash
       run: |
-        echo "chrome path" {{ steps.setup-chrome.outputs.chrome-path }}"
-        echo "chrome data dir" {{ steps.setup-chrome.outputs.chrome-user-data-dir }}"
+        echo "chrome path" ${{ steps.setup-chrome.outputs.chrome-path }}"
+        echo "chrome data dir" ${{ steps.setup-chrome.outputs.chrome-user-data-dir }}"
 
       #if: ${{ runner.os != 'macOS' && runner.environment != 'self-hosted' }}
       #uses: browser-actions/setup-chrome@v2.1.0
