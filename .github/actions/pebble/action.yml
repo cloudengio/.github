@@ -11,18 +11,24 @@ runs:
 
     - name: init pebble hosts Windows
       # Use PowerShell (the default shell on Windows runners)
-      if: ${{ runner.os == 'Windows' }}
+      if: ${{ runner.os == 'Windows' && runner.environment != 'self-hosted' }}
       shell: pwsh
       run: |
         Add-Content -Path $env:WINDIR\System32\drivers\etc\hosts -Value "127.0.0.1 pebble.example.com pebble-test.example.com"
         Get-Content -Path $env:WINDIR\System32\drivers\etc\hosts
 
     - name: init pebble hosts Linux or macOS
-      if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+      if: ${{ (runner.os == 'Linux' || runner.os == 'macOS') && runner.environment != 'self-hosted' }}
       shell: bash
       run: |
-        echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
-        cat /etc/hosts
+        if grep -q "pebble.example.com" /etc/hosts; then
+          # can't use sudo on locally hosted runners, we must be
+          # preconfigured with this entry
+          echo "pebble.example.com already exists in /etc/hosts"
+        else
+          echo "127.0.0.1 pebble.example.com pebble-test.example.com" | sudo tee -a /etc/hosts
+          cat /etc/hosts
+        fi
 
     - name: test pebble hosts on Linux or macOS
       shell: bash

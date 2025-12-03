@@ -6,119 +6,14 @@ outputs:
     value: ${{ steps.setup-chrome.outputs.chrome-path }}
   chrome-user-data-dir:
     description: "Path to the chrome user data directory"
-    value: ${{ steps.resolve-user-data.outputs.chrome-user-data-dir }}
+    value: ${{ steps.setup-chrome.outputs.chrome-user-data-dir }}
 
 runs:
   using: "composite"
   steps:
-    - name: install chrome for testing on Linux and Windows
-      if: ${{ runner.os != 'macOS' }}
-      uses: browser-actions/setup-chrome@v2
+    - name: install chrome for testing
+      shell: bash
       id: setup-chrome
-      with:
-        chrome-version: stable
-
-    - name: init chrome Linux
-      shell: bash
-      id: init-linux
-      if: ${{ runner.os == 'Linux' }}
       run: |
-        CHROME_PATH="${{ steps.setup-chrome.outputs.chrome-path }}"
-        USERDATA_DIR="/home/runner/.config/google-chrome-for-testing"
-        "$CHROME_PATH" --version
-        "$CHROME_PATH" --headless=new --disable-gpu --no-sandbox --remote-debugging-port=9222 --user-data-dir="$USERDATA_DIR" about:blank &
-        CHROME_PID=$!
-        waitforfiles --initial=5s --interval=1s --total=30s "$HOME/.pki/nssdb"
-        if [ $? -ne 0 ]; then
-          kill $CHROME_PID
-            exit 1
-          fi
-        kill $CHROME_PID
-
-        # this should already exist.
-        waitforfiles --interval=0 --total=0 "$USERDATA_DIR/Default"
-        echo "user-data-dir=$USERDATA_DIR" >> "$GITHUB_OUTPUT"
-
-    - name: init chrome Windows
-      shell: pwsh
-      id: init-windows
-      if: ${{ runner.os == 'Windows' }}
-      run: |
-        $chromePath = "${{ steps.setup-chrome.outputs.chrome-path }}"
-        & "$chromePath" --version
-
-        # Set sandbox permissions
-        $chromeDir = Split-Path -Parent $chromePath
-        icacls "$chromeDir" /grant 'ALL APPLICATION PACKAGES:(OI)(CI)(RX)' /grant 'ALL RESTRICTED APPLICATION PACKAGES:(OI)(CI)(RX)' /T /C | Out-Null
-        if ($LASTEXITCODE -ne 0) {
-          throw "icacls failed to set sandbox permissions on $chromeDir"
-        }
-
-        $userDataDir = Join-Path $env:RUNNER_TEMP "chrome-user-data"
-        $profilePath = Join-Path $userDataDir "Default"
-
-        $flags = @(
-          "--headless=new",
-          "--disable-gpu",
-          "--no-sandbox",
-          "--remote-debugging-port=9222",
-          "--user-data-dir=$userDataDir",
-          "about:blank"
-        )
-
-        $process = Start-Process -FilePath "$chromePath" -ArgumentList $flags -PassThru
-        #$profilePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
-
-        $goBinPath = (go env GOBIN)
-        if (-not $goBinPath) {
-          $goBinPath = (go env GOPATH) + "\bin"
-        }
-
-        & "$goBinPath\waitforfiles.exe" --initial=5s --interval=1s --total=30s $profilePath
-        Stop-Process -Id $process.Id -Force
-        "user-data-dir=$userDataDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-
-    - name: init chrome macOS
-      shell: bash
-      id: init-macos
-      if: ${{ runner.os == 'macOS' }}
-      run: |
-        CHROME_PATH="/Applications/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
-        "$CHROME_PATH" --version
-
-        USERDATA_DIR="$HOME/Library/Application Support/Google/Chrome for Testing"
-        PROFILE_DIR="$USERDATA_DIR/Default"
-
-        mkdir -p "$PROFILE_DIR"
-
-        "$CHROME_PATH" \
-            --headless=new \
-            --no-sandbox \
-            --disable-gpu \
-            --no-first-run \
-            --no-default-browser-check \
-            --user-data-dir="$USERDATA_DIR" \
-            about:blank &
-
-        CHROME_PID=$!
-
-        waitforfiles --initial=2s --interval=1s --total=30s "$PROFILE_DIR"
-        if [ $? -ne 0 ]; then
-          kill $CHROME_PID
-          exit 1
-        fi
-        kill $CHROME_PID
-
-        echo "user-data-dir=$USERDATA_DIR" >> "$GITHUB_OUTPUT"
-
-    - name: resolve chrome user data dir
-      id: resolve-user-data
-      shell: bash
-      run: |
-        for value in "${{ steps.init-windows.outputs.user-data-dir }}" "${{ steps.init-macos.outputs.user-data-dir }}" "${{ steps.init-linux.outputs.user-data-dir }}"; do
-          if [ -n "$value" ]; then
-            echo "chrome-user-data-dir=$value" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-        done
-        echo "chrome-user-data-dir=" >> "$GITHUB_OUTPUT"
+        go install cloudeng.io/citools/chrome-for-testing@latest
+        chrome-for-testing install --channel=stable --application=chrome --initialize

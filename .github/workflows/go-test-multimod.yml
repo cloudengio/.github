@@ -11,9 +11,12 @@ on:
             "1.24.x",
             "1.25.x" 
           ]
-      os-version:
+      runner:
         type: string
-        default: ubuntu-latest
+        default: |
+          [
+            "ubuntu-latest"
+          ]
       multimod-action:
         type: string
         default: "test"
@@ -27,7 +30,7 @@ jobs:
       matrix:
         go-version: ${{ fromJson(inputs.go-versions) }}
 
-    runs-on: ${{ inputs.os-version }}
+    runs-on: ${{ fromJson(inputs.runner) }}
 
     steps:
       - uses: actions/checkout@v5
