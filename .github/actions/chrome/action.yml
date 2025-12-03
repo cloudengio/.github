@@ -6,12 +6,12 @@ outputs:
     value: ${{ steps.setup-chrome.outputs.chrome-path }}
   chrome-user-data-dir:
     description: "Path to the chrome user data directory"
-    value: ${{ steps.resolve-user-data.outputs.chrome-user-data-dir }}
+    value: ${{ steps.setup-chrome.outputs.chrome-user-data-dir }}
 
 runs:
   using: "composite"
   steps:
-    - name: install chrome for testing #on Linux and Windows
+    - name: install chrome for testing
       shell: bash
       id: setup-chrome
       run: |
@@ -20,30 +20,30 @@ runs:
         #go install cloudeng.io/citools/chrome-for-testing@latest
         chrome-for-testing install --channel=stable --application=chrome --debug --initialize
 
-    - name: resolve chrome user data dir
-      shell: bash
-      run: |
-        echo "chrome path" ${{ steps.setup-chrome.outputs.chrome-path }}"
-        echo "chrome data dir" ${{ steps.setup-chrome.outputs.chrome-user-data-dir }}"
+    #- name: resolve chrome user data dir
+    #  shell: bash
+    #  run: |
+    #    echo "chrome path" ${{ steps.setup-chrome.outputs.chrome-path }}"
+    #    echo "chrome data dir" ${{ steps.setup-chrome.outputs.chrome-user-data-dir }}"
 
-    - name: debug Windows
-      if: ${{ always() && runner.os == 'Windows' }}
-      shell: pwsh
-      run: |
-        $chromePath = "C:\hostedtoolcache\windows\setup-chrome\chrome\stable\x64\chrome.exe" #"${{ steps.setup-chrome.outputs.chrome-path }}"
-        $chromeDir = Split-Path -Parent $chromePath
-        icacls "$chromeDir" /grant 'ALL APPLICATION PACKAGES:(OI)(CI)(RX)' /grant 'ALL RESTRICTED APPLICATION PACKAGES:(OI)(CI)(RX)' /T /C | Out-Null
-        $chromePath --version --headless=new
+    #- name: debug Windows
+    #  if: ${{ always() && runner.os == 'Windows' }}
+    #  shell: pwsh
+    #  run: |
+    #    $chromePath = "C:\hostedtoolcache\windows\setup-chrome\chrome\stable\x64\chrome.exe" #"${{ steps.setup-chrome.outputs.chrome-path }}"
+    #    $chromeDir = Split-Path -Parent $chromePath
+    #    icacls "$chromeDir" /grant 'ALL APPLICATION PACKAGES:(OI)(CI)(RX)' /grant 'ALL RESTRICTED APPLICATION PACKAGES:(OI)(CI)(RX)' /T /C | Out-Null
+    #    $chromePath --version --headless=new
 
-      #if: ${{ runner.os != 'macOS' && runner.environment != 'self-hosted' }}
-      #uses: browser-actions/setup-chrome@v2.1.0
-      #id: setup-chrome
-      #with:
-      #  install-dependencies: true
-      #  chrome-version: stable
+    #if: ${{ runner.os != 'macOS' && runner.environment != 'self-hosted' }}
+    #uses: browser-actions/setup-chrome@v2.1.0
+    #id: setup-chrome
+    #with:
+    #  install-dependencies: true
+    #  chrome-version: stable
 
-      # C:\Users\<Your_Username>\AppData\Local\Google\Chrome
-      # %LOCALAPPDATA%\Google\Chrome\User Data
+    # C:\Users\<Your_Username>\AppData\Local\Google\Chrome
+    # %LOCALAPPDATA%\Google\Chrome\User Data
 
     #  id: user-data-dir
     #  shell: bash
