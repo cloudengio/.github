@@ -18,7 +18,13 @@ runs:
         git clone --single-branch --branch chrome-for-testing https://github.com/cloudengio/citools.git $RUNNER_TEMP/citools
         (cd $RUNNER_TEMP/citools/chrome-for-testing && go install .)
         #go install cloudeng.io/citools/chrome-for-testing@latest
-        chrome-for-testing install --channel=stable --application=chrome --debug --initialize
+        chrome-for-testing install --channel=stable --application=chrome --initialize
+
+    - name: check if chrome is running
+      shell: bash
+      if: ${{ runner.os != 'Windows' }}
+      run: |
+        ps -ef | grep -i chrome
 
     #- name: resolve chrome user data dir
     #  shell: bash
