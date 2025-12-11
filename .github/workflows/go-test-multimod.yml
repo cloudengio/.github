@@ -20,6 +20,18 @@ on:
       multimod-action:
         type: string
         default: "test"
+      with-webapp:
+        type: boolean
+        default: false
+      with-pebble:
+        type: boolean
+        default: false
+      with-chrome:
+        type: boolean
+        default: false
+      with-mkcert:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -35,10 +47,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: cloudengio/.github/.github/actions/go@main
-      - uses: cloudengio/.github/.github/actions/pebble@main
-      - uses: cloudengio/.github/.github/actions/chrome@main
+      - if: ${{ inputs.with-webapp || inputs.with-pebble }}
+        uses: cloudengio/.github/.github/actions/pebble@main
+      - if: ${{ inputs.with-webapp || inputs.with-chrome }}
+        uses: cloudengio/.github/.github/actions/chrome@main
         id: setup-chrome
-      - uses: cloudengio/.github/.github/actions/mkcert@main
+      - if: ${{ inputs.with-webapp || inputs.with-mkcert }}
+        uses: cloudengio/.github/.github/actions/mkcert@main
 
       - name: test
         env:
