@@ -15,9 +15,6 @@ runs:
         git config --global core.autocrlf false
         git config --global core.eol lf
 
-    - name: Checkout code
-      uses: actions/checkout@v5
-
     - name: Set up Go
       uses: actions/setup-go@v6
       with:

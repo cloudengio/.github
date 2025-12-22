@@ -7,6 +7,9 @@ on:
         type: string
         description: "go version to lint with"
         default: "stable"
+      go-private:
+        type: string
+        default: ""
       runner:
         type: string
         default: |
@@ -22,7 +25,7 @@ jobs:
     runs-on: ${{ fromJson(inputs.runner) }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: cloudengio/.github/.github/actions/go@main
 
       - name: Lint
