@@ -11,9 +11,6 @@ on:
             "1.24.x",
             "1.25.x" 
           ]
-      go-private:
-        type: string
-        default: ""
       runner:
         type: string
         default: |
@@ -62,6 +59,4 @@ jobs:
         env:
           CHROME_BIN_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
           CHROME_USER_DATA_DIR: ${{ steps.setup-chrome.outputs.chrome-user-data-dir }}
-        run: |
-          go env -w GOPRIVATE=${{ inputs.go-private }}
-          multimod --config=.multimod.yaml ${{ inputs.multimod-action }}
+        run: multimod --config=.multimod.yaml ${{ inputs.multimod-action }}
