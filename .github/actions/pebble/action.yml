@@ -1,13 +1,20 @@
 name: pebble
-description: "set up Pebble environment"
+description: "set up Pebble environment"\
+inputs:
+  pebble-version:
+    description: "pebble versions to set up"
+    default: "v2.9.0"
+  minica-version:
+    description: "minica versions to set up"
+    default: "v1.1.0"
 runs:
   using: "composite"
   steps:
     - name: install pebble and minica
       shell: bash
       run: |
-        go install github.com/letsencrypt/pebble/v2/cmd/pebble@latest
-        go install github.com/jsha/minica@latest
+        go install github.com/letsencrypt/pebble/v2/cmd/pebble@${{ inputs.pebble-version }}
+        go install github.com/jsha/minica@${{ inputs.minica-version }}
 
     - name: init pebble hosts Windows
       # Use PowerShell (the default shell on Windows runners)
