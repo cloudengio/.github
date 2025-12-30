@@ -3,7 +3,7 @@ description: "set up Pebble environment"
 inputs:
   pebble-version:
     description: "pebble version to set up"
-    default: "v2.9.0"
+    default: "v2.8.0"
   minica-version:
     description: "minica version to set up"
     default: "v1.1.0"
