@@ -26,6 +26,9 @@ on:
       with-pebble:
         type: boolean
         default: false
+      pebble-version:
+        type: string
+        default: "v2.8.0"
       with-chrome:
         type: boolean
         default: false
@@ -49,6 +52,8 @@ jobs:
       - uses: cloudengio/.github/.github/actions/go@main
       - if: ${{ inputs.with-webapp || inputs.with-pebble }}
         uses: cloudengio/.github/.github/actions/pebble@main
+        with:
+          pebble-version: ${{ inputs.pebble-version }}
       - if: ${{ inputs.with-webapp || inputs.with-chrome }}
         uses: cloudengio/.github/.github/actions/chrome@main
         id: setup-chrome
