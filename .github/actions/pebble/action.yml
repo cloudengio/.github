@@ -1,11 +1,11 @@
 name: pebble
-description: "set up Pebble environment"\
+description: "set up Pebble environment"
 inputs:
   pebble-version:
-    description: "pebble versions to set up"
+    description: "pebble version to set up"
     default: "v2.9.0"
   minica-version:
-    description: "minica versions to set up"
+    description: "minica version to set up"
     default: "v1.1.0"
 runs:
   using: "composite"
