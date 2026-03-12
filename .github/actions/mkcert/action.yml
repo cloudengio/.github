@@ -14,7 +14,7 @@ runs:
       if: ${{ runner.os == 'macOS' && runner.environment != 'self-hosted' }}
       shell: bash
       run: |
-        go install filippo.io/mkcert@latest
+        go install github.com/cloudengio/mkcert@latest
 
         CAROOT=$(mkcert -CAROOT)
         mkcert -install
@@ -32,14 +32,14 @@ runs:
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
-        go install filippo.io/mkcert@latest
+        go install github.com/cloudengio/mkcert@latest
         mkcert -install
 
     - name: build and run mkcert Windows
       if: ${{ runner.os == 'Windows' && runner.environment != 'self-hosted' }}
       shell: pwsh
       run: |
-        go install filippo.io/mkcert@latest
+        go install github.com/cloudengio/mkcert@latest
         $env:CAROOT = "$(pwd)/mkcert-ca"
         New-Item -ItemType Directory -Force -Path $env:CAROOT
         # Create a cert to generate the CA files, but don't run install.
