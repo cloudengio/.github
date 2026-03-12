@@ -32,8 +32,8 @@ runs:
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
-        find / -name '.pki'
-        find / -name 'chromium'
+        sudo find / -name '.pki'
+        sudo find / -name 'chromium'
         go install github.com/cloudengio/mkcert@109ef62
         mkcert -install
 
