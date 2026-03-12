@@ -15,5 +15,5 @@ runs:
       shell: bash
       id: setup-chrome
       run: |
-        go install cloudeng.io/citools/chrome-for-testing@latest
-        chrome-for-testing install --channel=stable --application=chrome --initialize
+        go install cloudeng.io/citools/chrome-for-testing@119a4ce
+        chrome-for-testing install --channel=stable --application=chrome --initialize --nss-dir=$HOME/.local/share/pki/nssdb

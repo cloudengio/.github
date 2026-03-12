@@ -32,17 +32,11 @@ runs:
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
-        echo ".. .pki"
-        sudo find $HOME -name '.pki'
-        echo ".. pki"
-        sudo find $HOME -name 'pki'
-        echo ".. chromium"
-        sudo find $HOME -name 'chromium'
         echo ".. nssdb"
-        sudo find / -name 'nssdb'
-        ls -Rl /home/runner/.config/google-chrome-for-testing
+        sudo find $HOME -name 'nssdb'
+        ls -R /home/runner/.config/google-chrome-for-testing
         ls -Rl /home/runner/.pki
-        go install github.com/cloudengio/mkcert@109ef62
+        go install github.com/cloudengio/mkcert@b5781f3
         mkcert -install
 
     - name: build and run mkcert Windows
