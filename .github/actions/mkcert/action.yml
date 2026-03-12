@@ -14,8 +14,6 @@ runs:
       if: ${{ runner.os == 'macOS' && runner.environment != 'self-hosted' }}
       shell: bash
       run: |
-        # avoid warning for firefox.
-        brew install nss
   
         go install github.com/cloudengio/mkcert@latest
 
