@@ -35,7 +35,6 @@ runs:
         echo ".. nssdb .. home: $HOME"
         sudo find / -name 'nssdb'
         ls -R /home/runner/.config/google-chrome-for-testing
-        ls -Rl /home/runner/.pki
         go install github.com/cloudengio/mkcert@b5781f3
         mkcert -install
 
