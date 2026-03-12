@@ -32,8 +32,8 @@ runs:
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
-        echo ".. nssdb"
-        sudo find $HOME -name 'nssdb'
+        echo ".. nssdb .. home: $HOME"
+        sudo find / -name 'nssdb'
         ls -R /home/runner/.config/google-chrome-for-testing
         ls -Rl /home/runner/.pki
         go install github.com/cloudengio/mkcert@b5781f3
