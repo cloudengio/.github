@@ -32,7 +32,7 @@ runs:
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
-        go install github.com/cloudengio/mkcert@5b2f070
+        go install github.com/cloudengio/mkcert@17a48bb
         mkcert -install
 
     - name: build and run mkcert Windows
