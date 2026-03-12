@@ -32,7 +32,11 @@ runs:
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
+        echo ".pki"
         sudo find / -name '.pki'
+        echo "pki"
+        sudo find / -name 'pki'
+        echo "chromium"
         sudo find / -name 'chromium'
         go install github.com/cloudengio/mkcert@109ef62
         mkcert -install
