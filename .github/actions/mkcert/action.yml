@@ -14,6 +14,9 @@ runs:
       if: ${{ runner.os == 'macOS' && runner.environment != 'self-hosted' }}
       shell: bash
       run: |
+        # avoid warning for firefox.
+        brew install nss
+  
         go install github.com/cloudengio/mkcert@latest
 
         CAROOT=$(mkcert -CAROOT)
@@ -32,10 +35,7 @@ runs:
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
-        echo ".. nssdb .. home: $HOME"
-        sudo find / -name 'nssdb'
-        ls -R /home/runner/.config/google-chrome-for-testing
-        go install github.com/cloudengio/mkcert@b5781f3
+        go install github.com/cloudengio/mkcert@latest
         mkcert -install
 
     - name: build and run mkcert Windows
