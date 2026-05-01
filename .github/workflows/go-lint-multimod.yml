@@ -29,6 +29,11 @@ jobs:
       - uses: cloudengio/.github/.github/actions/go@main
 
       - name: Lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.11.4
+
+      - name: Lint
         run: multimod --config=.multimod.yaml lint
 
       - name: Vulnerability
