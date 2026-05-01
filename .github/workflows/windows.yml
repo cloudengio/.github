@@ -13,20 +13,20 @@ jobs:
   chrome:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/go
       - uses: ./.github/actions/chrome
 
   mkcert:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/go
       - uses: ./.github/actions/mkcert
 
   pebble:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/go
       - uses: ./.github/actions/pebble
