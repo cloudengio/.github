@@ -25,10 +25,16 @@ jobs:
     runs-on: ${{ fromJson(inputs.runner) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
+      - name: Normalize go-version
+        id: goversion
+        run: |
+          v="${{ inputs.go-version }}"
+          v="${v#>=}"
+          echo "value=$v" >> "$GITHUB_OUTPUT"
       - uses: cloudengio/.github/.github/actions/go@main
         with:
-          go-version: ${{ inputs.go-version }}
+          go-version: ${{ steps.goversion.outputs.value }}
 
       - name: Install golangci-lint
         uses: golangci/golangci-lint-action@v9

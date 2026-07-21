@@ -48,7 +48,7 @@ jobs:
     runs-on: ${{ fromJson(inputs.runner) }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: cloudengio/.github/.github/actions/go@main
       - if: ${{ inputs.with-webapp || inputs.with-pebble }}
         uses: cloudengio/.github/.github/actions/pebble@main
