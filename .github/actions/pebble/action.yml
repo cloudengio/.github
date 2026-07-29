@@ -12,9 +12,34 @@ runs:
   steps:
     - name: install pebble and minica
       shell: bash
+      env:
+        PEBBLE_VERSION: ${{ inputs.pebble-version }}
+        MINICA_VERSION: ${{ inputs.minica-version }}
       run: |
-        go install github.com/letsencrypt/pebble/v2/cmd/pebble@${{ inputs.pebble-version }}
-        go install github.com/jsha/minica@${{ inputs.minica-version }}
+        set -euo pipefail
+        if [[ "${RUNNER_ENVIRONMENT}" == "self-hosted" ]]; then
+          # pebble and minica are prebaked into the runner image (see
+          # github-runners/macos/scripts/10-pebble-minica.sh). Select the
+          # requested version and add it to PATH; error if it was not baked in.
+          tools_root=/opt/gha-tools
+
+          pebble_dir="${tools_root}/pebble/${PEBBLE_VERSION}"
+          if [[ ! -x "${pebble_dir}/pebble" ]]; then
+            echo "::error::pebble ${PEBBLE_VERSION} is not preinstalled in this runner image (available: $(ls "${tools_root}/pebble" 2>/dev/null | tr '\n' ' '))" >&2
+            exit 1
+          fi
+          echo "${pebble_dir}" >> "${GITHUB_PATH}"
+
+          minica_dir="${tools_root}/minica/${MINICA_VERSION}"
+          if [[ ! -x "${minica_dir}/minica" ]]; then
+            echo "::error::minica ${MINICA_VERSION} is not preinstalled in this runner image (available: $(ls "${tools_root}/minica" 2>/dev/null | tr '\n' ' '))" >&2
+            exit 1
+          fi
+          echo "${minica_dir}" >> "${GITHUB_PATH}"
+        else
+          go install "github.com/letsencrypt/pebble/v2/cmd/pebble@${PEBBLE_VERSION}"
+          go install "github.com/jsha/minica@${MINICA_VERSION}"
+        fi
 
     - name: init pebble hosts Windows
       # Use PowerShell (the default shell on Windows runners)
