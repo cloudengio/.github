@@ -7,15 +7,24 @@ outputs:
   chrome-user-data-dir:
     description: "Path to the chrome user data directory"
     value: ${{ steps.setup-chrome.outputs.chrome-user-data-dir }}
-
 runs:
   using: "composite"
   steps:
-    - name: install chrome for testing
+    - name: set up chrome for testing
       shell: bash
       id: setup-chrome
       run: |
-        go install cloudeng.io/citools/chrome-for-testing@latest
-        # Note that chrome-for-testing updates the github action outputs
-        chrome-for-testing install --channel=stable --application=chrome --initialize
-      
+        set -euo pipefail
+        if [[ runner.environment == "self-hosted" ]]; then
+          # Chrome for Testing is preinstalled in the runner image (see
+          # github-runners/macos/scripts/09-chrome-for-testing.sh). Resolve the
+          # install paths from the same code that installed them instead of
+          # downloading. `paths` contacts no network, verifies the binary is
+          # present, and writes chrome-path and chrome-user-data-dir to
+          # $GITHUB_OUTPUT. The platform/arch is detected automatically.
+          chrome-for-testing paths --channel=stable --application=chrome
+        else
+          go install cloudeng.io/citools/chrome-for-testing@latest
+          # chrome-for-testing writes chrome-path and chrome-user-data-dir to $GITHUB_OUTPUT
+          chrome-for-testing install --channel=stable --application=chrome --initialize
+        fi
