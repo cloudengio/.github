@@ -20,6 +20,7 @@ runs:
       with:
         go-version: ${{ inputs.go-version }}
         cache-dependency-path: "**/*.sum"
+        cache: ${{ runner.environment != 'self-hosted' }}
 
     - name: Install tools
       shell: bash
