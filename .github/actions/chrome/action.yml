@@ -15,6 +15,13 @@ runs:
       id: setup-chrome
       run: |
         set -euo pipefail
+        # Chrome for Testing has no linux/arm64 build (Google only publishes
+        # linux64/x64). There is nothing to install or resolve on such hosts, so
+        # skip cleanly without setting outputs. Consumers gate on runner.os/arch.
+        if [[ "${RUNNER_OS}" == "Linux" && "${RUNNER_ARCH}" == "ARM64" ]]; then
+          echo "::notice::Chrome for Testing has no linux/arm64 build; skipping Chrome setup."
+          exit 0
+        fi
         if [[ runner.environment == "self-hosted" ]]; then
           # Chrome for Testing is preinstalled in the runner image (see
           # github-runners/macos/scripts/09-chrome-for-testing.sh). Resolve the
