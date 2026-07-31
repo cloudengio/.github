@@ -35,6 +35,12 @@ on:
       with-mkcert:
         type: boolean
         default: false
+      with-lint:
+        type: boolean
+        default: false
+      with-govuln:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -65,3 +71,19 @@ jobs:
           CHROME_BIN_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
           CHROME_USER_DATA_DIR: ${{ steps.setup-chrome.outputs.chrome-user-data-dir }}
         run: multimod --config=.multimod.yaml ${{ inputs.multimod-action }}
+
+      - name: Install golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        if: ${{ inputs.with-lint }}
+        with:
+          install-only: true
+          version: latest
+
+      - name: Lint
+        if: ${{ inputs.with-lint }}
+        run: multimod --config=.multimod.yaml lint
+
+      - name: Vulnerability
+        if: ${{ inputs.with-govuln }}
+        run: multimod --config=.multimod.yaml govuln
+
