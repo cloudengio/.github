@@ -74,16 +74,17 @@ jobs:
 
       - name: Install golangci-lint
         uses: golangci/golangci-lint-action@v9
+        id: lint_installed
         if: always() && !cancelled() && inputs.with-lint
         with:
           install-only: true
           version: latest
 
       - name: Lint
-        if: ${{ inputs.with-lint }}
+        if: always() && !cancelled() && inputs.with-lint && steps.lint_installed == 'success'
         run: multimod --config=.multimod.yaml lint
 
       - name: Vulnerability
-        if: ${{ inputs.with-govuln }}
+        if: always() && !cancelled() && ${{ inputs.with-lint }}
         run: multimod --config=.multimod.yaml govuln
 
