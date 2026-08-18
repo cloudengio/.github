@@ -81,10 +81,10 @@ jobs:
           version: latest
 
       - name: Lint
-        if: always() && !cancelled() && inputs.with-lint && steps.lint_installed == 'success'
+        if: always() && !cancelled() && inputs.with-lint
         run: multimod --config=.multimod.yaml lint
 
       - name: Vulnerability
-        if: always() && !cancelled() && ${{ inputs.with-govuln }}
+        if: always() && !cancelled() && inputs.with-govuln
         run: multimod --config=.multimod.yaml govuln
 
