@@ -28,7 +28,7 @@ jobs:
       - name: configure goproxy
         run: |
           if ${{ runner.environment == 'self-hosted' }}; then
-            echo "GOPROXY=\"http://gomodproxy.pa.nicolaou.org:3000,direct\"" >> $GITHUB_ENV
+            echo "GOPROXY=http://gomodproxy.pa.nicolaou.org:3000,direct" >> $GITHUB_ENV
           fi
 
       - uses: actions/checkout@v7
