@@ -24,6 +24,9 @@ jobs:
   lint:
     runs-on: ${{ fromJson(inputs.runner) }}
 
+    env:
+      GOPROXY: ${{ runner.environment == 'self-hosted' && "http://gomodproxy.pa.nicolaou.org:3000,direct" || "https://proxy.golang.org,direct" }}
+
     steps:
       - uses: actions/checkout@v7
       - name: Normalize go-version
