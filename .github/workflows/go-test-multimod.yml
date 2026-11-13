@@ -54,6 +54,12 @@ jobs:
     runs-on: ${{ fromJson(inputs.runner) }}
 
     steps:
+      - name: Set git to use LF
+        if: ${{ runner.os == 'windows' }}
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - name: configure goproxy
         run: |
           if ${{ runner.environment == 'self-hosted' }}; then
