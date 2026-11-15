@@ -25,15 +25,22 @@ jobs:
     runs-on: ${{ fromJson(inputs.runner) }}
 
     steps:
-      - name: configure goproxy
+      - name: Set git to use LF
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
         run: |
-          if ${{ runner.environment == 'self-hosted' }}; then
-            echo "GOPROXY=http://gomodproxy.pa.nicolaou.org:3000,direct" >> $GITHUB_ENV
-          fi
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: configure goproxy
+        if: ${{ runner.environment == 'self-hosted' }}
+        shell: bash
+        run: echo "GOPROXY=http://gomodproxy.pa.nicolaou.org:3000,direct" >> "$GITHUB_ENV"
 
       - uses: actions/checkout@v7
       - name: Normalize go-version
         id: goversion
+        shell: bash
         run: |
           v="${{ inputs.go-version }}"
           v="${v#>=}"
